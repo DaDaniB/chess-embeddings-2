@@ -1,0 +1,16 @@
+import numpy as np
+import tensorflow as tf
+
+DIFFERENT_PIECES = 12
+BOARD_SQUARES = 64
+BOARD_SIDE_LENGTH = 8
+
+VECTOR_LENGTH = 768
+VECTOR_WITH_INFO_LENGTH = 779
+
+ENPASSANT_VEC_LENGTH = 6
+
+DATA_TYPE = np.bool_
+TF_DATA_TYPE = tf.bool
+
+MODELS_SAVE_DIR = "./models"
