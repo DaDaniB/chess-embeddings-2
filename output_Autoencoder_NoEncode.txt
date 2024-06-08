@@ -1,52 +1,6 @@
 ######## test legal vs illegal #############
-Mean distance between illegal random positions and illegal random positions is: 5.4183878898620605
-Mean distance between illegal random positions and legal positions is: 6.000811576843262
-Mean distance between legal positions and legal positions is: 4.988481044769287
-######################################
-
-######## test meaningful positions #########
-avg dist with played position: 1.4940738677978516 and avg dist with random position: 1.4333603382110596######################################
-
-######## test opening positions ############
-Mean distance between e4 e5 Nf3 Nc6 Bc4 and e4 e5 Nf3 Nc6 Bc4 is: 3.755188226699829
-Mean distance between e4 e5 Nf3 Nc6 Bc4 and e4 e5 Nf3 Nc6 Bb5 is: 4.053990840911865
-Mean distance between e4 e5 Nf3 Nc6 Bb5 and e4 e5 Nf3 Nc6 Bb5 is: 3.8200607299804688
-######################################
-
-######## test eco ##########################
-Mean distance between A and A is: 3.8785595893859863
-Mean distance between A and B is: 4.140954494476318
-Mean distance between A and C is: 4.3651299476623535
-Mean distance between A and D is: 4.274623394012451
-Mean distance between A and E is: 4.680093288421631
-Mean distance between B and B is: 3.8912525177001953
-Mean distance between B and C is: 4.261818885803223
-Mean distance between B and D is: 4.344383716583252
-Mean distance between B and E is: 4.861023426055908
-Mean distance between C and C is: 4.13876485824585
-Mean distance between C and D is: 4.612715244293213
-Mean distance between C and E is: 5.013282299041748
-Mean distance between D and D is: 4.101092338562012
-Mean distance between D and E is: 4.613650798797607
-Mean distance between E and E is: 4.474538326263428
-######################################
-
-######## test tactics ######################
-Mean distance between anastasiaMate and anastasiaMate is: 5.3831257820129395
-Mean distance between anastasiaMate and arabianMate is: 5.541116237640381
-Mean distance between anastasiaMate and backRankMate is: 5.398129463195801
-Mean distance between anastasiaMate and smotheredMate is: 5.722058296203613
-Mean distance between arabianMate and arabianMate is: 5.363461494445801
-Mean distance between arabianMate and backRankMate is: 5.465174198150635
-Mean distance between arabianMate and smotheredMate is: 5.832063674926758
-Mean distance between backRankMate and backRankMate is: 5.160890102386475
-Mean distance between backRankMate and smotheredMate is: 5.610596656799316
-Mean distance between smotheredMate and smotheredMate is: 5.716640472412109
-######################################
-
-######## expert players ####################
-Mean distance between ./data/expert-players/Carlsen/Carlsen.pgn and ./data/expert-players/Carlsen/Carlsen.pgn is: 5.382136344909668
-Mean distance between ./data/expert-players/Carlsen/Carlsen.pgn and ./data/expert-players/Tal/Tal.pgn is: 5.893728256225586
-Mean distance between ./data/expert-players/Tal/Tal.pgn and ./data/expert-players/Tal/Tal.pgn is: 5.028141975402832
+Mean distance between illegal random positions and illegal random positions is: 5.42985725402832
+Mean distance between illegal random positions and legal positions is: 5.94698429107666
+Mean distance between legal positions and legal positions is: 5.664028167724609
 ######################################
 

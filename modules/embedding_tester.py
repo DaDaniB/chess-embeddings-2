@@ -16,8 +16,8 @@ from modules.embedding_test import (
 )
 from modules.visualization.TSNE_visualizer import TSNEVisualizer
 
-TEST_AMOUNT = 100
-VISUALIZATION_AMOUNT = 100
+TEST_AMOUNT = 10000
+VISUALIZATION_AMOUNT = 1000
 
 
 TEST_END_TEXT = "######################################\n\n"

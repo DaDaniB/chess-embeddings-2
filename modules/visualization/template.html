@@ -5,10 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess embedding visualization</title>
-
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 
@@ -75,8 +71,6 @@
             background-color: brown;
         }
     </style>
-
-
     <script>
 
         let points = HTML_PLACEHOLDER_FOR_JSON
@@ -91,9 +85,6 @@
         let plot = document.getElementById("plot")
         plot.setAttribute("width", PLOT_WIDTH)
         plot.setAttribute("height", PLOT_HEIGHT)
-
-
-
 
         // functions
         function mapValue(value, fromLow, fromHigh, toLow, toHigh) {
@@ -131,7 +122,6 @@
 
         let mappedPoints = mapPointsToPlot(points, PLOT_WIDTH, PLOT_HEIGHT)
 
-
         var svg = d3.select("svg");
         let circles = svg.selectAll("circle")
             .data(mappedPoints)
@@ -144,57 +134,52 @@
             .attr("class", "plotPoint");
 
 
-        const chess = new Chess()
         let board = document.getElementById("board")
         let previousBoard = document.getElementById("previousBoard")
 
-
-        board.innerHTML = "<pre>" + visualizeAsciiBoard(chess.ascii()) + "</pre>"
-        previousBoard.innerHTML = "<pre>" + visualizeAsciiBoard(chess.ascii()) + "</pre>"
+        const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        board.innerHTML = "<pre>" + visualizeFENBoard(START_FEN) + "</pre>"
+        previousBoard.innerHTML = "<pre>" + visualizeFENBoard(START_FEN) + "</pre>"
 
         circles.on("click", function (event, d) {
             try {
                 previousBoard.innerHTML = board.innerHTML
-
-                chess.load(d.position)
-                ascii = chess.ascii()
-                console.log(chess.ascii())
-                board.innerHTML = "<pre>" + visualizeAsciiBoard(ascii) + "</pre>"
+                console.log(d.position)
+                board.innerHTML = "<pre>" + visualizeFENBoard(d.position) + "</pre>"
             } catch (e) {
                 console.log(e)
             }
 
         });
 
-        function visualizeAsciiBoard(ascii) {
-            let inRow = false;
-            let isWhiteField = false
+        function visualizeFENBoard(fen) {
+            const START_ROW = '<div class="row">'
+            const END_ROW = '</div>'
 
-            vis = ""
-            for (c of ascii) {
-                if (c === '|') {
-                    inRow = !inRow // inside / outside row
-
-                    if (inRow) {
-                        vis += "<div class='row'>"
-                    } else {
-                        vis += '</div>'
-                    }
-                }
-
-
-                if (inRow) {
-                    if (c === ' ') {
-                        continue
-                    }
-                    c = mapPieceCharField(c, isWhiteField)
+            vis = START_ROW
+            let isWhiteField = true;
+            for (c of fen) {
+                if (c == '/') {
+                    vis += END_ROW
+                    vis += START_ROW
                     isWhiteField = !isWhiteField
-
-                    vis += c
+                    continue
+                } else if (c == ' ') {
+                    break
                 }
 
-
+                cNum = parseInt(c)
+                if (!isNaN(cNum)) {
+                    for (let i = 0; i < cNum; i++) {
+                        vis += createField(" ", isWhiteField)
+                        isWhiteField = !isWhiteField
+                    }
+                } else {
+                    vis += mapPieceCharField(c, isWhiteField)
+                    isWhiteField = !isWhiteField
+                }
             }
+            vis += END_ROW
             return vis
         }
 
@@ -221,8 +206,6 @@
             background = !isWhiteField ? "fieldWithBackground" : ""
             return "<div class='pieceSquare " + background + "'>" + unicode + "</div>"
         }
-
-
     </script>
 </body>
 

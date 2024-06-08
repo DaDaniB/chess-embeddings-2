@@ -13,3 +13,11 @@ class FEN:
 
     def __repr__(self):
         return f"'{str(self.FEN)}'"
+
+    def __eq__(self, other):
+        if isinstance(other, FEN):
+            return self.FEN == other.FEN
+        return False
+
+    def __hash__(self):
+        return hash(self.FEN)
