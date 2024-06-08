@@ -90,3 +90,16 @@ class BaseAutoEncoder(tf.keras.models.Model, ABC):
 
     def save(self, savename: str):
         self.save_weights(constants.MODELS_SAVE_DIR + "/" + savename + ".h5")
+
+    def encode_FEN_position_tensor(self, FEN: FEN):
+        position_tensor = self.FEN_to_tensor(FEN)
+        return self.encoder(position_tensor)
+
+    def encode_FEN_position(self, FEN: FEN):
+        # position_tensor = self.FEN_to_tensor(FEN)
+        # return self.encoder(position_tensor).numpy()
+        return self.encode_FEN_position_tensor(FEN).numpy()
+
+    def FEN_to_tensor(self, FEN: FEN):
+        vector = self.vectorize_FEN(FEN)
+        return tf.convert_to_tensor(np.array([vector]), dtype=constants.TF_DATA_TYPE)

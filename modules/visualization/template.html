@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess embedding visualization</title>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+    <h3 class="info_container">HTML_PLACEHOLDER_FOR_INFO</h3>
+    <div class="container">
+        <svg id="plot"></svg>
+        <div class="boardContainer">
+            <p>current</p>
+            <div id="board" class="board"></div>
+            <p>previous</p>
+            <div id="previousBoard" class="board"></div>
+        </div>
+    </div>
+
+    <style>
+        body {
+            background-color: #fcfbf4;
+        }
+
+        .info_container {
+            margin: 1rem 3rem 0 3rem;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        #plot {
+            margin: 3rem;
+            overflow: visible;
+            border: 1px solid black;
+        }
+
+        .plotPoint {
+            cursor: pointer;
+        }
+
+        .board {
+            height: max-content;
+            width: max-content;
+            font-size: 2.5rem;
+            border: solid 1rem black
+        }
+
+        .board pre {
+            padding: 0;
+            margin: 0;
+        }
+
+        .pieceSquare {
+            width: 2.5rem;
+            height: 2.5rem;
+            text-align: center;
+            line-height: 3rem;
+        }
+
+        .row {
+            display: flex;
+            flex-flow: row;
+        }
+
+        .fieldWithBackground {
+            background-color: brown;
+        }
+    </style>
+
+
+    <script>
+
+        let points = HTML_PLACEHOLDER_FOR_JSON
+
+        console.log(`number of points: ${points.length}`)
+
+        const PLOT_WIDTH = 800
+        const PLOT_HEIGHT = 600
+        const POINT_SIZE = 3
+
+        // set plot size
+        let plot = document.getElementById("plot")
+        plot.setAttribute("width", PLOT_WIDTH)
+        plot.setAttribute("height", PLOT_HEIGHT)
+
+
+
+
+        // functions
+        function mapValue(value, fromLow, fromHigh, toLow, toHigh) {
+            return (value - fromLow) / (fromHigh - fromLow) * (toHigh - toLow) + toLow
+        }
+
+        function findHighestAndLowestValue(entries, getValue) {
+            let highest = Number.MIN_SAFE_INTEGER
+            let lowest = Number.MAX_SAFE_INTEGER
+
+            for (entry of entries) {
+                value = getValue(entry)
+                if (value > highest) {
+                    highest = value
+                }
+                if (value < lowest) {
+                    lowest = value
+                }
+            }
+
+            return [highest, lowest]
+        }
+
+        function mapPointsToPlot(points, plotWidth, plotHeight) {
+            let [highestX, lowestX] = findHighestAndLowestValue(points, point => point.x)
+            let [highestY, lowestY] = findHighestAndLowestValue(points, point => point.y)
+
+            for (point of points) {
+                point.x = mapValue(point.x, lowestX, highestX, 0, plotWidth)
+                point.y = mapValue(point.y, lowestY, highestY, 0, plotHeight)
+            }
+
+            return points
+        }
+
+        let mappedPoints = mapPointsToPlot(points, PLOT_WIDTH, PLOT_HEIGHT)
+
+
+        var svg = d3.select("svg");
+        let circles = svg.selectAll("circle")
+            .data(mappedPoints)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) { return d.x; })
+            .attr("cy", function (d) { return d.y; })
+            .attr("r", POINT_SIZE)
+            .attr("fill", function (d) { return d.color; })
+            .attr("class", "plotPoint");
+
+
+        const chess = new Chess()
+        let board = document.getElementById("board")
+        let previousBoard = document.getElementById("previousBoard")
+
+
+        board.innerHTML = "<pre>" + visualizeAsciiBoard(chess.ascii()) + "</pre>"
+        previousBoard.innerHTML = "<pre>" + visualizeAsciiBoard(chess.ascii()) + "</pre>"
+
+        circles.on("click", function (event, d) {
+            try {
+                previousBoard.innerHTML = board.innerHTML
+
+                chess.load(d.position)
+                ascii = chess.ascii()
+                console.log(chess.ascii())
+                board.innerHTML = "<pre>" + visualizeAsciiBoard(ascii) + "</pre>"
+            } catch (e) {
+                console.log(e)
+            }
+
+        });
+
+        function visualizeAsciiBoard(ascii) {
+            let inRow = false;
+            let isWhiteField = false
+
+            vis = ""
+            for (c of ascii) {
+                if (c === '|') {
+                    inRow = !inRow // inside / outside row
+
+                    if (inRow) {
+                        vis += "<div class='row'>"
+                    } else {
+                        vis += '</div>'
+                    }
+                }
+
+
+                if (inRow) {
+                    if (c === ' ') {
+                        continue
+                    }
+                    c = mapPieceCharField(c, isWhiteField)
+                    isWhiteField = !isWhiteField
+
+                    vis += c
+                }
+
+
+            }
+            return vis
+        }
+
+        function mapPieceCharField(c, isWhiteField) {
+            switch (c) {
+                case 'p': return createField("&#x265F;", isWhiteField)
+                case 'n': return createField("&#x265E;", isWhiteField)
+                case 'b': return createField("&#x265D;", isWhiteField)
+                case 'r': return createField("&#x265C;", isWhiteField)
+                case 'q': return createField("&#x265B;", isWhiteField)
+                case 'k': return createField("&#x265A;", isWhiteField)
+                case 'P': return createField("&#x2659;", isWhiteField)
+                case 'N': return createField("&#x2658;", isWhiteField)
+                case 'B': return createField("&#x2657;", isWhiteField)
+                case 'R': return createField("&#x2656;", isWhiteField)
+                case 'Q': return createField("&#x2655;", isWhiteField)
+                case 'K': return createField("&#x2654;", isWhiteField)
+                case '.': return createField(" ", isWhiteField)
+                default: return ""
+            }
+        }
+
+        function createField(unicode, isWhiteField) {
+            background = !isWhiteField ? "fieldWithBackground" : ""
+            return "<div class='pieceSquare " + background + "'>" + unicode + "</div>"
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -6,6 +6,8 @@ from modules import constants
 from modules.FEN_converter import FENConverter
 from modules.autoencoder.base_autoencoder import BaseAutoEncoder
 
+from modules.vectorization.FEN import FEN
+
 LATENT_DIM = 16
 INPUT_SIZE = constants.VECTOR_LENGTH
 
@@ -34,8 +36,8 @@ class Autoencoder_Linear16(BaseAutoEncoder):
         self.build((None, self.input_size))
         super(Autoencoder_Linear16, self).load_weights(filepath)
 
-    def vectorize_FEN(self, fen: str):
-        return FENConverter.to_vector(fen)
+    def vectorize_FEN(self, FEN: str):
+        return FENConverter.to_vector(FEN(FEN))
 
     def vector_to_FEN(self, vector):
         return FENConverter.vector_to_FEN(vector)

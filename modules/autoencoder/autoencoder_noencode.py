@@ -1,6 +1,7 @@
 import tensorflow as tf
 from modules.autoencoder.base_autoencoder import BaseAutoEncoder
 from modules.FEN_converter import FENConverter
+from modules.vectorization.FEN import FEN
 
 
 class Autoencoder_NoEncode(BaseAutoEncoder):
@@ -16,8 +17,8 @@ class Autoencoder_NoEncode(BaseAutoEncoder):
         self.build((None, self.input_size))
         super(Autoencoder_NoEncode, self).load_weights(filepath)
 
-    def vectorize_FEN(self, fen: str):
-        return FENConverter.to_vector(fen)
+    def vectorize_FEN(self, FEN: FEN):
+        return FENConverter.to_vector(FEN)
 
     def vector_to_FEN(self, vector):
         return FENConverter.vector_to_FEN(vector)

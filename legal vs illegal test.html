@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess embedding visualization</title>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+    <h3 class="info_container">Autoencoder_NoEncode  </br> DATASETS: illegal random positions(red) || legal positions(green) || </h3>
+    <div class="container">
+        <svg id="plot"></svg>
+        <div class="boardContainer">
+            <p>current</p>
+            <div id="board" class="board"></div>
+            <p>previous</p>
+            <div id="previousBoard" class="board"></div>
+        </div>
+    </div>
+
+    <style>
+        body {
+            background-color: #fcfbf4;
+        }
+
+        .info_container {
+            margin: 1rem 3rem 0 3rem;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        #plot {
+            margin: 3rem;
+            overflow: visible;
+            border: 1px solid black;
+        }
+
+        .plotPoint {
+            cursor: pointer;
+        }
+
+        .board {
+            height: max-content;
+            width: max-content;
+            font-size: 2.5rem;
+            border: solid 1rem black
+        }
+
+        .board pre {
+            padding: 0;
+            margin: 0;
+        }
+
+        .pieceSquare {
+            width: 2.5rem;
+            height: 2.5rem;
+            text-align: center;
+            line-height: 3rem;
+        }
+
+        .row {
+            display: flex;
+            flex-flow: row;
+        }
+
+        .fieldWithBackground {
+            background-color: brown;
+        }
+    </style>
+
+
+    <script>
+
+        let points = [{'x': 3.4577491, 'y': 8.289368, 'position': '5P2/1q3b1b/5p2/3p3B/3pPp2/2p1P3/6p1/1p2p3 b Kq h2', 'color': 'red'}, {'x': 0.08671706, 'y': 6.036831, 'position': 'p4p1P/bp1PP3/r7/1NB1BP2/P2R4/p1pp4/5PP1/1R1P1pp1 b q g7', 'color': 'red'}, {'x': 5.0756493, 'y': 6.4060564, 'position': '8/1P1QN1b1/1Rb5/1p6/1P5n/1Nr1r3/7R/q5k1 b q c6', 'color': 'red'}, {'x': 1.2806977, 'y': 6.8374944, 'position': '2R1pR2/5PbN/5r2/2B1kNB1/P7/8/1n1PPP2/3p2b1 w KQkq d7', 'color': 'red'}, {'x': 7.7597075, 'y': 2.5799117, 'position': '4P1PN/rrPBR1p1/5Q2/3P1P2/4b2p/2B5/2P4k/2P5 w kq b4', 'color': 'red'}, {'x': 4.971395, 'y': 7.22057, 'position': 'P5n1/4R1NP/nP3PBP/7r/r6P/8/1N4pb/5b2 b Q e4', 'color': 'red'}, {'x': 4.237249, 'y': 4.065686, 'position': '2p5/p1r2R1p/4n2k/4P3/8/5R2/1r6/8 w KQq f4', 'color': 'red'}, {'x': 3.7981563, 'y': 5.272111, 'position': 'b7/2p5/3B3p/6b1/4p3/k7/8/4R2R w Kkq f3', 'color': 'red'}, {'x': 2.798416, 'y': 2.213027, 'position': '2P1p3/P2B2B1/6k1/1pr2Pp1/p3P3/1rP5/1p1pp3/3P3p w Qkq a6', 'color': 'red'}, {'x': 1.6567707, 'y': 4.5306873, 'position': '1b2pn1p/7p/p3b2B/3P4/3rB3/7r/p2p4/1p4R1 w Qq h1', 'color': 'red'}, {'x': 1.5170686, 'y': 1.5313697, 'position': '1pq2N2/p2P4/8/3pbPpP/pp5P/2b1R3/4N3/Pp6 w k d4', 'color': 'red'}, {'x': 1.5115756, 'y': 6.0338306, 'position': '6RP/3P1q1N/1b3r2/1p3B2/r2Rb3/k1P1p3/8/5n1P b KQ h4', 'color': 'red'}, {'x': 5.80403, 'y': 1.3165901, 'position': 'PP5p/2P3p1/N1PP3p/2NP2p1/3p1p2/3PRPp1/8/1p6 w Qk f8', 'color': 'red'}, {'x': 5.5339656, 'y': 3.6124158, 'position': '2PN3P/2R1q3/8/4P1r1/8/p4PPb/1P6/8 w Qkq f5', 'color': 'red'}, {'x': 4.0664425, 'y': 6.859166, 'position': '2B5/1P6/8/3Rp3/4PQpR/kP5p/3b2P1/p5B1 w K h2', 'color': 'red'}, {'x': 4.9033527, 'y': 3.0296688, 'position': '2p5/2P3P1/8/PP3k2/3P2P1/2b2PP1/p2pb3/6p1 w q d6', 'color': 'red'}, {'x': 3.6616418, 'y': 8.8773575, 'position': 'r4P1p/P1R4P/4R2p/2npN3/5pB1/2PB3n/3p2pk/3rp3 b KQkq h7', 'color': 'red'}, {'x': 6.50544, 'y': 4.531005, 'position': 'PBB1pp2/3k1p1P/1P6/8/b1PpP3/Q2p1Pq1/2Pp1Pb1/8 b K b4', 'color': 'red'}, {'x': 2.5044527, 'y': 6.543336, 'position': '3Rk3/4R3/B6p/pp2n1rp/pb1B4/4bp2/6P1/1p6 w - b1', 'color': 'red'}, {'x': 3.7968512, 'y': 7.0323606, 'position': '5p2/2N1rb1n/4R2r/4p2B/1b2P3/N7/6P1/5P2 w Qk d6', 'color': 'red'}, {'x': 3.9412372, 'y': 2.3943987, 'position': '1R4Pq/3p1p2/8/5r1k/5Pr1/pp4b1/P1p5/3ppp2 b - e8', 'color': 'red'}, {'x': 6.972337, 'y': 8.361098, 'position': '1B1P4/2kRp3/7N/4P2q/R2PP3/2r2pNn/5B2/2Q1PP2 w Kk b8', 'color': 'red'}, {'x': 6.803438, 'y': 5.967527, 'position': 'p4PNn/3p2Pn/b4p2/4b3/kp2P1Rr/1pr5/1Q2p3/8 w Qk e8', 'color': 'red'}, {'x': 2.0828087, 'y': 7.552796, 'position': '1r1pP3/6pn/8/b1P1Qp2/1k5P/1Ppn2p1/2Bp2p1/5p2 w kq f8', 'color': 'red'}, {'x': 4.399481, 'y': 4.768722, 'position': 'P7/3Np3/3p4/6PP/7r/8/4rQ2/8 w Qq c5', 'color': 'red'}, {'x': 4.655929, 'y': 2.260732, 'position': '1P4p1/4N3/1pR2P1P/P3rr2/1N3PP1/6p1/1Q2B1p1/3R2p1 w KQ c3', 'color': 'red'}, {'x': 3.8232176, 'y': 4.472355, 'position': '5b2/5Q2/8/5kp1/8/6NB/8/b3B3 w KQq a4', 'color': 'red'}, {'x': 3.5998387, 'y': 6.172774, 'position': '1P1Pk3/r1N1R3/4R3/2p5/N7/2p3bP/2P5/2Q5 w KQkq g7', 'color': 'red'}, {'x': 3.0325456, 'y': 1.264227, 'position': '5p2/p3R1p1/8/1p3p2/7b/1R1r2p1/NNpQ4/3p2b1 w K d5', 'color': 'red'}, {'x': 6.3358583, 'y': 5.4567275, 'position': '2r2P2/8/b7/p2p2r1/P2Pp2B/1p1p1PB1/8/8 w Qq h2', 'color': 'red'}, {'x': 5.0524282, 'y': 4.6567073, 'position': '4P3/1r6/5p2/1R6/2P3n1/2Q1P3/2P5/4k2p b Qq d5', 'color': 'red'}, {'x': 5.599236, 'y': 5.850915, 'position': '8/Np2p3/3P4/1p2p1nb/BrQ1B3/3r4/p7/4P1P1 b KQk f1', 'color': 'red'}, {'x': -0.7622515, 'y': 4.7385216, 'position': 'R7/1k4P1/4p1p1/3R2p1/np1p4/8/P1q2Pp1/B1b1p3 w k e4', 'color': 'red'}, {'x': 5.869734, 'y': -0.29326528, 'position': '1r3P2/1r2p1p1/k3p3/3p1B2/4Q1P1/1q3R2/3P1R1p/N2P3P b Kq e5', 'color': 'red'}, {'x': 4.700094, 'y': 8.101991, 'position': 'P4Qk1/7N/2P2PB1/1n4Rp/p1Nrp3/7n/1p6/3r3R b Q b8', 'color': 'red'}, {'x': 1.3419204, 'y': 8.591787, 'position': '4PN2/N1pQnP2/1pRP2P1/2P1pp1p/1P1n4/2r3b1/1pp3p1/k3R2P b K f4', 'color': 'red'}, {'x': 4.6527543, 'y': 5.7190003, 'position': '2R2P2/4P3/n3n3/8/1kP1B2P/4R3/1P6/1r2N3 b Kkq b7', 'color': 'red'}, {'x': 2.5715714, 'y': 5.712758, 'position': '3Ppk2/1p3Q2/P4P2/2P1N3/N2P4/4b3/5r2/q1b5 b - g1', 'color': 'red'}, {'x': 2.2304313, 'y': 0.3759536, 'position': '6P1/8/4PP2/2qpnB2/2Qp2b1/4pPPP/3B2P1/1p6 b q c7', 'color': 'red'}, {'x': 7.5435853, 'y': 3.888861, 'position': 'N1P4P/1k1Pp3/2p1Qqp1/5PnB/2p5/P5B1/1Pb5/p2bP3 b KQ e7', 'color': 'red'}, {'x': 2.0962012, 'y': 5.173511, 'position': 'Np2q3/B2p4/8/R2Q4/P1Pnn2b/1bP2P2/7B/8 b Qkq h4', 'color': 'red'}, {'x': 3.4112039, 'y': 2.8487346, 'position': '5p2/4pp2/1p4r1/Nbp5/p1p5/1q2P3/bn1n4/5N2 b KQkq e7', 'color': 'red'}, {'x': 1.072078, 'y': 5.4756927, 'position': '1R5P/P2P1P2/1P6/3r4/1k1R3N/8/r5b1/P2PP3 w kq e1', 'color': 'red'}, {'x': -0.21962841, 'y': 2.3563578, 'position': 'PP1p2P1/P7/1P6/p2p2Pr/2p1N3/1RPqB3/pQRp4/4N1pP b Kkq g2', 'color': 'red'}, {'x': 0.064741254, 'y': 3.6579096, 'position': 'N5Pp/P6p/2p3pn/2rR4/2n5/r1p3p1/2p2P2/3N4 w K d2', 'color': 'red'}, {'x': 8.998346, 'y': 3.4193015, 'position': 'r2P2b1/2p4r/Pnq2p2/2R2pb1/NkP1p3/1R4P1/1P1p1P1p/Qp1p4 b q g4', 'color': 'red'}, {'x': 0.29714066, 'y': 7.4668994, 'position': '1nQ3b1/7q/3B1P2/1nPP2k1/8/3P4/2bp1ppP/4R2N w Kkq a8', 'color': 'red'}, {'x': 4.3787403, 'y': 4.8708315, 'position': '3P4/8/4B1p1/4Q3/3b4/N7/p4N1r/8 w Q h2', 'color': 'red'}, {'x': 3.3273652, 'y': 5.455732, 'position': 'N2p4/1p3B2/7p/4n3/8/1np5/7Q/4N3 b kq g4', 'color': 'red'}, {'x': 4.345246, 'y': 3.175442, 'position': '6PN/8/2b2N2/2PBP3/3P2P1/2P5/8/RB2q1b1 w Kkq a8', 'color': 'red'}, {'x': 1.7759118, 'y': 2.5672998, 'position': '2p5/5r1b/1p1pP2p/3n3q/6Pk/1P2N3/PBbN2np/5R2 b KQk e1', 'color': 'red'}, {'x': 3.7982254, 'y': 4.7255726, 'position': '8/8/5Rn1/8/2RP1b2/8/4P3/1p6 w k f5', 'color': 'red'}, {'x': 3.8433976, 'y': 5.8509936, 'position': 'rP6/1R6/1R5n/NP2Q3/5N1q/k2n4/3P4/2p5 w Qk f8', 'color': 'red'}, {'x': 3.4359193, 'y': 3.849971, 'position': '1n1bQ3/p7/5N2/8/1r4n1/B4r1B/8/3k2N1 b KQk h3', 'color': 'red'}, {'x': 5.775036, 'y': 7.7105584, 'position': 'p1r2p2/2q5/2Q1p3/P6p/P3b1pP/2n2n2/8/1p1p3p b KQq a1', 'color': 'red'}, {'x': 6.740963, 'y': 2.2683437, 'position': 'n1Q5/6Pb/5P1p/r2P4/p1P1Bb1P/p3r1P1/np5p/6Pp w Q -', 'color': 'red'}, {'x': 6.708209, 'y': 3.5385408, 'position': 'P2P1B2/2r5/RP6/8/p1n5/3BR1P1/PPp5/kP3p2 b KQk d4', 'color': 'red'}, {'x': 3.8641396, 'y': 3.460854, 'position': '7R/4kp2/p4b2/2p5/1N5R/B6p/2p1p3/p1p5 b Kq c1', 'color': 'red'}, {'x': 3.3782237, 'y': 3.438973, 'position': '4Q3/pr1q1N2/3R2N1/2p3p1/2p1r3/6B1/6n1/8 b KQk e4', 'color': 'red'}, {'x': 6.7560735, 'y': 6.9741592, 'position': '4P3/1QN1pP2/2Pp4/4ppr1/3P1p2/3P2R1/p6r/Pn6 w KQq a3', 'color': 'red'}, {'x': 5.43126, 'y': 2.4776897, 'position': '2nP4/3B2P1/N7/3RPR2/1NPn1P2/8/4P2b/PB2Q3 b k b7', 'color': 'red'}, {'x': 1.3191912, 'y': 3.8149447, 'position': '5Q2/p2p2rN/5kB1/R7/P6r/8/3Pp2p/PB1P2P1 b Qk f7', 'color': 'red'}, {'x': 5.9472737, 'y': 3.8451493, 'position': '4qPN1/5B2/p1Q1nP2/kP1P3n/8/p6b/6P1/P6p b k -', 'color': 'red'}, {'x': 7.256146, 'y': 1.0631404, 'position': 'p6R/2q1ppP1/r3P1p1/B5p1/1PP2P2/p5NP/2PN1p1b/5Q1b w KQ b5', 'color': 'red'}, {'x': 2.936873, 'y': 4.4905286, 'position': '1b6/8/2p4r/5P2/6P1/3N2pq/1Pn3NP/b7 b Q e8', 'color': 'red'}, {'x': 2.4040465, 'y': 4.455969, 'position': '5k1R/7p/b3P3/6p1/2N5/8/P5b1/1p1Q1NR1 w Kq e4', 'color': 'red'}, {'x': 4.600056, 'y': 4.1116858, 'position': '2p2R2/2B5/1P5P/4P3/B1P5/7R/8/2P3q1 b Kk b4', 'color': 'red'}, {'x': 4.3267245, 'y': 4.8296666, 'position': '8/2P1Q3/P3B3/8/1q2p2p/4P3/8/7N b Kq d7', 'color': 'red'}, {'x': 7.9191217, 'y': 7.2902293, 'position': '3Pn2p/1p2pb1P/3p4/8/3P1B2/k1Pp2NP/7P/5B1p b Kkq h1', 'color': 'red'}, {'x': 3.9163737, 'y': 4.6023555, 'position': '6P1/8/5NB1/8/5B2/8/3q4/4PP2 b KQk c5', 'color': 'red'}, {'x': 3.052304, 'y': 6.0076337, 'position': '4p1p1/8/P1r2r1p/7B/8/N1p3R1/NP2b3/1Q6 b Qkq d3', 'color': 'red'}, {'x': 3.9674578, 'y': 0.28221568, 'position': '3PNQ2/4P3/7q/7p/2pP1P1p/P1p1r1N1/3P4/5R2 w Kk b6', 'color': 'red'}, {'x': 5.4956303, 'y': 4.7860003, 'position': '1Q6/3PB3/3R1p2/2P3n1/1p6/1k4N1/2P5/p7 b Qkq g3', 'color': 'red'}, {'x': 0.6972153, 'y': 4.8522553, 'position': '2np1N1P/3p1Ppp/8/r7/1pBB4/6p1/q7/1P2P3 b Qq f1', 'color': 'red'}, {'x': 7.998243, 'y': 5.979415, 'position': '4P1Pp/Q2PNn2/1r1P2P1/8/3Pp2p/3n1P2/pr6/3p3P w Kq b4', 'color': 'red'}, {'x': 3.4374933, 'y': 4.803568, 'position': '5n2/5r2/8/5B2/2R5/8/7B/1Rbbr2Q w Kk e2', 'color': 'red'}, {'x': 2.125087, 'y': 2.934052, 'position': '5r1p/3p3b/1p3R1p/2rp4/1n6/4kP2/3p2np/8 w q b5', 'color': 'red'}, {'x': 0.8201258, 'y': 3.0662308, 'position': '3B4/7p/1pp1p2n/3p2R1/1Pn5/3N3p/p7/1BN5 b Q g6', 'color': 'red'}, {'x': 5.08231, 'y': 5.2485576, 'position': '6QB/4N2P/8/2kn2nb/8/8/2b1p3/2P4B b Qkq h3', 'color': 'red'}, {'x': 0.31291485, 'y': 0.6463599, 'position': '3b2p1/pPp1p1pP/p2PNpP1/6R1/3P4/1PRnP3/P3n1rk/Bp6 w Q e7', 'color': 'red'}, {'x': 2.926407, 'y': 7.1168947, 'position': '2Np4/qb1R4/2pP4/1P3R2/4Q2r/8/NP2P3/2pP3p b q h6', 'color': 'red'}, {'x': 4.2980022, 'y': 5.3906956, 'position': '2R5/1Pn5/1P6/7k/3Q4/8/4R1p1/4b2p w KQk e6', 'color': 'red'}, {'x': 4.5121474, 'y': 6.1221266, 'position': '5P2/1P1rP2p/n7/b1q3bk/8/4Q3/r7/p2p1P2 w - c7', 'color': 'red'}, {'x': 7.2668247, 'y': 5.0399404, 'position': 'P1n5/1q5r/2B2p2/pP3p2/p7/3p1PR1/2n1rN2/1N2B3 b KQq e1', 'color': 'red'}, {'x': 2.9262495, 'y': 5.1605434, 'position': '1n2R2Q/7p/r3rR2/p1p3b1/3p4/1p6/6p1/6b1 w KQ f3', 'color': 'red'}, {'x': 5.8034005, 'y': 4.8201632, 'position': 'k2B4/3P4/6Q1/2P5/1P2Nr2/6BN/2P5/2r3PP w kq b1', 'color': 'red'}, {'x': 2.210234, 'y': 3.8856442, 'position': '5R1R/P1Qb4/P1qn4/3P4/7B/7P/P7/n2P1P2 w k d3', 'color': 'red'}, {'x': 3.9842153, 'y': 4.414681, 'position': '2p2b1R/7N/8/p7/8/N1b5/4B3/p7 b KQq f7', 'color': 'red'}, {'x': 5.4007807, 'y': 9.091634, 'position': '3P4/1Pq2n2/8/1PP2P2/2p2p2/b7/1pRP2Qp/1P1nP1kR w K c2', 'color': 'red'}, {'x': 8.474733, 'y': 4.818635, 'position': 'p7/4Bp2/RRqppP2/2r5/2k4p/4p3/2p5/N3Pp1N w K h2', 'color': 'red'}, {'x': 2.7399676, 'y': 8.838863, 'position': '3NN3/3P3P/b3PQp1/Pb1pr2B/6PR/2p2B2/Pp4pR/1p4pp b KQq h4', 'color': 'red'}, {'x': 5.8801417, 'y': 6.5445848, 'position': '2R1R3/1N1b4/2bP4/3P1P2/NPp1nP2/3P1pk1/p7/8 b Qk g7', 'color': 'red'}, {'x': 3.7467058, 'y': 4.1692863, 'position': '6P1/8/Np3P2/8/8/B7/1B3k2/3P4 b Q b3', 'color': 'red'}, {'x': 3.1732802, 'y': 4.1588264, 'position': '1P2QPN1/n7/8/r4P2/6n1/P4B2/6kB/6P1 w Qk h1', 'color': 'red'}, {'x': 6.0722027, 'y': 2.9017372, 'position': '2Pbnr1P/6Bn/k7/2N1PpP1/b5p1/PR6/1Qr2P2/8 b KQk d4', 'color': 'red'}, {'x': 4.834284, 'y': 3.7617078, 'position': '1Np1R3/8/N1BPB3/7p/3q4/1Q2r3/8/1k2bp2 b kq c6', 'color': 'red'}, {'x': 5.0660324, 'y': 0.91456586, 'position': '4P2p/3B2p1/8/1B4P1/k2nq3/P5p1/7r/Rp2p3 b Qkq h3', 'color': 'red'}, {'x': 4.076904, 'y': 1.4462582, 'position': '6PR/6p1/4p3/1p4rk/2P5/R2p1BP1/1p1p4/1b3B2 w KQ d3', 'color': 'red'}, {'x': 4.960938, 'y': 4.5224967, 'position': '8/2R4P/4B3/7n/3b1P2/6P1/2P3P1/1n6 w Qk a6', 'color': 'red'}, {'x': 2.6532967, 'y': 3.3423386, 'position': '4b3/3p4/1pBrP3/4p2p/6p1/4qn2/7p/p3p2n w kq b3', 'color': 'red'}, {'x': -7.970651, 'y': -9.419676, 'position': 'r1bqkb1r/pp3ppp/2n1pn2/3p4/2PP4/2N2N2/PP3PPP/R1BQKB1R w KQkq - 0 7', 'color': 'green'}, {'x': -8.0538, 'y': -9.033783, 'position': 'r1bqkb1r/pp3ppp/2n2n2/1B1p4/3P4/2N2N2/PP3PPP/R1BQK2R b KQkq - 1 8', 'color': 'green'}, {'x': -1.9669209, 'y': -8.960304, 'position': '3qk2r/p3nppp/1pp1pb2/4n3/8/3P2P1/PPP1NPQP/R1B2RK1 w k - 6 14', 'color': 'green'}, {'x': 2.3720818, 'y': -4.0417423, 'position': '8/p2qkpp1/4p3/3p1P1p/2rN4/P1P3PP/1P2Q3/5R1K w - - 1 29', 'color': 'green'}, {'x': -8.552497, 'y': -4.3441777, 'position': 'r5k1/p1q4p/3b2pB/5p2/3P4/3Q1N2/PP3PPP/R3r1K1 w - - 0 20', 'color': 'green'}, {'x': -4.2872868, 'y': -10.223412, 'position': 'r2qk1nr/pBpn1ppp/1p2pb2/8/8/3P2P1/PPP2P1P/R1BQK1NR w KQkq - 1 9', 'color': 'green'}, {'x': 2.342829, 'y': -4.0016356, 'position': '8/p2qkpp1/4P3/3p3p/2rN4/P1P3PP/1P2Q3/5R1K b - - 0 29', 'color': 'green'}, {'x': 2.4474998, 'y': -3.8763742, 'position': '8/p2qk1p1/4p3/3p3p/2rN4/P1P3PP/1P2Q3/5R1K w - - 0 30', 'color': 'green'}, {'x': -7.953225, 'y': -9.4101925, 'position': 'r1bqkb1r/pp3ppp/2n1pn2/3P4/3P4/2N2N2/PP3PPP/R1BQKB1R b KQkq - 0 7', 'color': 'green'}, {'x': -5.2355943, 'y': -10.632978, 'position': 'rnbqkbnr/p1p2ppp/1p2p3/8/4N3/3P2P1/PPP2P1P/R1BQKBNR b KQkq - 0 5', 'color': 'green'}, {'x': 0.1085958, 'y': -7.433651, 'position': '4k2r/p3npp1/2p1pn2/2p4p/5P2/2PqB1PP/PP2N1Q1/R4R1K w k - 2 21', 'color': 'green'}, {'x': -8.548628, 'y': -4.103611, 'position': 'r5k1/p1q4p/3b2pB/5p2/3P4/3Q1N2/PP3PPP/4R1K1 b - - 0 20', 'color': 'green'}, {'x': 2.6270235, 'y': -3.6567256, 'position': '8/p2qk1p1/4p3/3p3Q/2rN4/P1P3PP/1P6/5R1K b - - 0 30', 'color': 'green'}, {'x': -1.7700107, 'y': -8.851933, 'position': '3qk2r/p3nppp/1pp1pb2/4n3/5P2/3P2P1/PPP1N1QP/R1B2RK1 b k - 0 14', 'color': 'green'}, {'x': -8.044822, 'y': -7.3461165, 'position': 'r2q3r/p3kppp/2Qb4/3n1b2/3P4/5N2/PP3PPP/R1B1K2R w KQ - 0 13', 'color': 'green'}, {'x': 0.36087844, 'y': -7.115547, 'position': '4k2r/p3Bpp1/2p1p3/3n3p/5P2/2Pq2PP/PP2N1Q1/R4R1K b k - 0 22', 'color': 'green'}, {'x': -7.762656, 'y': -10.271157, 'position': 'r1bqkbnr/pp1p1ppp/2n1p3/8/2Pp4/4PN2/PP3PPP/RNBQKB1R w KQkq - 0 5', 'color': 'green'}, {'x': 2.8167644, 'y': -3.5444446, 'position': '8/p2q2p1/3kp3/3p3Q/2rN4/P1P3PP/1P6/5R1K w - - 1 31', 'color': 'green'}, {'x': -8.699897, 'y': -3.8388813, 'position': '3r2k1/p1q4p/3b2pB/5p2/3P4/3Q1N2/PP3PPP/4R1K1 w - - 1 21', 'color': 'green'}, {'x': -8.215834, 'y': -6.187776, 'position': 'r2qrk2/p4p1p/3b2p1/5Q2/3P4/4BN2/PP3PPP/R3K2R w KQ - 0 16', 'color': 'green'}, {'x': -5.041011, 'y': -10.62269, 'position': 'rn1qkbnr/pbp2ppp/1p2p3/8/4N3/3P2P1/PPP2P1P/R1BQKBNR w KQkq - 1 6', 'color': 'green'}, {'x': -6.7216887, 'y': -11.039433, 'position': 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1', 'color': 'green'}, {'x': 2.8738945, 'y': -3.5024903, 'position': '8/p2q2p1/3kp3/3p2Q1/2rN4/P1P3PP/1P6/5R1K b - - 2 31', 'color': 'green'}, {'x': 2.9053373, 'y': -3.2012146, 'position': '8/pq4p1/3kp3/3p2Q1/2rN4/P1P3PP/1P6/5R1K w - - 3 32', 'color': 'green'}, {'x': -8.837525, 'y': -3.6632318, 'position': '3r2k1/p1q4p/3b2pB/5p2/3P4/1Q3N2/PP3PPP/4R1K1 b - - 2 21', 'color': 'green'}, {'x': -3.3012424, 'y': -9.710294, 'position': 'q3k1nr/p2n1ppp/1pp1pb2/8/8/3P1QP1/PPP1NP1P/R1B1K2R b KQk - 1 11', 'color': 'green'}, {'x': 2.6986768, 'y': -3.0244486, 'position': '8/pq4p1/3kp3/3p4/2rN1Q2/P1P3PP/1P6/5R1K b - - 4 32', 'color': 'green'}, {'x': -7.2325377, 'y': -11.077414, 'position': 'rnbqkbnr/pp1ppppp/8/2p5/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2', 'color': 'green'}, {'x': -8.904672, 'y': -3.5182927, 'position': '3r2k1/p4q1p/3b2pB/5p2/3P4/1Q3N2/PP3PPP/4R1K1 w - - 3 22', 'color': 'green'}, {'x': 2.4973614, 'y': -2.907283, 'position': '8/pq4p1/4p3/2kp4/2rN1Q2/P1P3PP/1P6/5R1K w - - 5 33', 'color': 'green'}, {'x': 0.5129532, 'y': -6.9101696, 'position': '7r/p3kpp1/2p1p3/3n3p/5P2/2Pq2PP/PP2N1Q1/R4R1K w - - 0 23', 'color': 'green'}, {'x': -8.7324705, 'y': -3.5388324, 'position': '3r2k1/p4Q1p/3b2pB/5p2/3P4/5N2/PP3PPP/4R1K1 b - - 0 22', 'color': 'green'}, {'x': -8.050301, 'y': -7.4292154, 'position': 'r2q3r/p3kppp/2Qb1n2/3N1b2/3P4/5N2/PP3PPP/R1B1K2R b KQ - 0 12', 'color': 'green'}, {'x': -8.104806, 'y': -6.863853, 'position': 'r2qr3/p3kppp/3b4/5Q2/3P4/5N2/PP3PPP/R1B1K2R b KQ - 0 14', 'color': 'green'}, {'x': -6.527043, 'y': -10.927392, 'position': 'rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2', 'color': 'green'}, {'x': -4.874234, 'y': -10.624072, 'position': 'rn1qkbnr/pbp2ppp/1p2p3/8/4N3/3P2P1/PPP2PBP/R1BQK1NR b KQkq - 2 6', 'color': 'green'}, {'x': -8.691439, 'y': -3.291716, 'position': '3r4/p4k1p/3b2pB/5p2/3P4/5N2/PP3PPP/4R1K1 w - - 0 23', 'color': 'green'}, {'x': -1.6573714, 'y': -8.787641, 'position': '3qk2r/p3nppp/1pp1pb2/8/5Pn1/3P2P1/PPP1N1QP/R1B2RK1 w k - 1 15', 'color': 'green'}, {'x': 2.3028235, 'y': -2.5110452, 'position': '8/pq4p1/4N3/2kp4/2r2Q2/P1P3PP/1P6/5R1K b - - 0 33', 'color': 'green'}, {'x': 2.3439443, 'y': -2.4111614, 'position': '8/pq4p1/4N3/1k1p4/2r2Q2/P1P3PP/1P6/5R1K w - - 1 34', 'color': 'green'}, {'x': -0.31315076, 'y': -7.802027, 'position': '3qk2r/p3npp1/1pp1pn2/2b4p/3P1P2/2P3PP/PP2N1Q1/R1B2R1K w k - 0 19', 'color': 'green'}, {'x': -7.8724117, 'y': -9.831836, 'position': 'r1bqkb1r/pp1p1ppp/2n1pn2/8/2PP4/5N2/PP3PPP/RNBQKB1R w KQkq - 1 6', 'color': 'green'}, {'x': -4.1637216, 'y': -10.17007, 'position': 'B2qk1nr/p1pn1ppp/1p2pb2/8/8/3P2P1/PPP2P1P/R1BQK1NR b KQk - 0 9', 'color': 'green'}, {'x': -8.656064, 'y': -3.057452, 'position': '3r4/p4k1p/3b2pB/5pN1/3P4/8/PP3PPP/4R1K1 b - - 1 23', 'color': 'green'}, {'x': 2.5362265, 'y': -2.6048002, 'position': '8/pq4p1/8/1k1p4/2rN1Q2/P1P3PP/1P6/5R1K b - - 2 34', 'color': 'green'}, {'x': 0.1332806, 'y': -7.386669, 'position': '4k2r/p3npp1/2p1pn2/2B4p/5P2/2Pq2PP/PP2N1Q1/R4R1K b k - 0 21', 'color': 'green'}, {'x': -7.937978, 'y': -9.61444, 'position': 'r1bqkb1r/pp1p1ppp/2n1pn2/8/2PP4/2N2N2/PP3PPP/R1BQKB1R b KQkq - 2 6', 'color': 'green'}, {'x': -8.256865, 'y': -5.9095836, 'position': 'r2qr1k1/p4p1p/3b2p1/8/3P4/3QBN2/PP3PPP/R3K2R w KQ - 2 17', 'color': 'green'}, {'x': 2.6392486, 'y': -2.692785, 'position': '8/pq4p1/8/k2p4/2rN1Q2/P1P3PP/1P6/5R1K w - - 3 35', 'color': 'green'}, {'x': -8.624054, 'y': -3.2972174, 'position': '3r2k1/p6p/3b2pB/5pN1/3P4/8/PP3PPP/4R1K1 w - - 2 24', 'color': 'green'}, {'x': -8.04961, 'y': -7.326237, 'position': 'r2q3r/p3kppp/3b4/3Q1b2/3P4/5N2/PP3PPP/R1B1K2R b KQ - 0 13', 'color': 'green'}, {'x': 0.62449217, 'y': -6.7729473, 'position': '7r/p3kpp1/2p1p3/3n3p/5P2/2Pq2PP/PP2N1Q1/3R1R1K b - - 1 23', 'color': 'green'}, {'x': 2.9649267, 'y': -2.4408076, 'position': '8/pq4p1/8/k2p4/1PrN1Q2/P1P3PP/8/5R1K b - - 0 35', 'color': 'green'}, {'x': -6.3880854, 'y': -10.868309, 'position': 'rnbqkbnr/pppp1ppp/4p3/8/4P3/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 2', 'color': 'green'}, {'x': -3.2119057, 'y': -9.6607485, 'position': 'q3k1nr/p4ppp/1pp1pb2/4n3/8/3P1QP1/PPP1NP1P/R1B1K2R w KQk - 2 12', 'color': 'green'}, {'x': -7.9934435, 'y': -9.228266, 'position': 'r1bqkb1r/pp3ppp/2n2n2/3p4/3P4/2N2N2/PP3PPP/R1BQKB1R w KQkq - 0 8', 'color': 'green'}, {'x': -1.4442136, 'y': -8.656687, 'position': '3qk2r/p3nppp/1pp1pb2/8/5Pn1/3P2PP/PPP1N1Q1/R1B2RK1 b k - 0 15', 'color': 'green'}, {'x': -8.3676815, 'y': -3.3163846, 'position': '3r2k1/p6p/3bN1pB/5p2/3P4/8/PP3PPP/4R1K1 b - - 3 24', 'color': 'green'}, {'x': -1.3088372, 'y': -8.572586, 'position': '3qk2r/p3nppp/1pp1p3/8/3b1Pn1/3P2PP/PPP1N1Q1/R1B2RK1 w k - 1 16', 'color': 'green'}, {'x': 3.0685818, 'y': -2.3678055, 'position': '8/pq4p1/8/3p4/kPrN1Q2/P1P3PP/8/5R1K w - - 1 36', 'color': 'green'}, {'x': -4.7524104, 'y': -10.640053, 'position': 'rn1qk1nr/pbp1bppp/1p2p3/8/4N3/3P2P1/PPP2PBP/R1BQK1NR w KQkq - 3 7', 'color': 'green'}, {'x': -8.099315, 'y': -8.82049, 'position': 'r2qkb1r/pp3ppp/2n2n2/1B1p1b2/3P4/2N2N2/PP3PPP/R1BQK2R w KQkq - 2 9', 'color': 'green'}, {'x': -8.144212, 'y': -8.265479, 'position': 'r2qk2r/pp3ppp/2Bb1n2/3p1b2/Q2P4/2N2N2/PP3PPP/R1B1K2R b KQkq - 0 10', 'color': 'green'}, {'x': -3.997601, 'y': -10.090313, 'position': 'q3k1nr/p1pn1ppp/1p2pb2/8/8/3P2P1/PPP2P1P/R1BQK1NR w KQk - 0 10', 'color': 'green'}, {'x': -8.136414, 'y': -8.662955, 'position': 'r2qkb1r/pp3ppp/2n2n2/1B1p1b2/Q2P4/2N2N2/PP3PPP/R1B1K2R b KQkq - 3 9', 'color': 'green'}, {'x': 3.2359078, 'y': -2.2853055, 'position': '8/pq4p1/8/3p4/kPrN4/P1P3PP/8/2Q2R1K b - - 2 36', 'color': 'green'}, {'x': -8.026734, 'y': -3.3916197, 'position': '4r1k1/p6p/3bN1pB/5p2/3P4/8/PP3PPP/4R1K1 w - - 4 25', 'color': 'green'}, {'x': -6.259247, 'y': -10.808403, 'position': 'rnbqkbnr/ppp2ppp/4p3/3p4/4P3/3P4/PPP2PPP/RNBQKBNR w KQkq - 0 3', 'color': 'green'}, {'x': 3.277829, 'y': -1.8168604, 'position': '8/pq4p1/8/3p4/kP1r4/P1P3PP/8/2Q2R1K w - - 0 37', 'color': 'green'}, {'x': -8.237193, 'y': -6.0515537, 'position': 'r2qrk2/p4p1p/3b2p1/8/3P4/3QBN2/PP3PPP/R3K2R b KQ - 1 16', 'color': 'green'}, {'x': -4.6956587, 'y': -10.644606, 'position': 'rn1qk1nr/pbp1bppp/1p2pN2/8/8/3P2P1/PPP2PBP/R1BQK1NR b KQkq - 4 7', 'color': 'green'}, {'x': -7.6028895, 'y': -10.795042, 'position': 'rnbqkbnr/pp1ppppp/8/8/2Pp4/5N2/PP2PPPP/RNBQKB1R b KQkq - 1 3', 'color': 'green'}, {'x': -7.7926116, 'y': -3.1323147, 'position': '4r1k1/p6p/3bN1pB/3P1p2/8/8/PP3PPP/4R1K1 b - - 0 25', 'color': 'green'}, {'x': 0.67659616, 'y': -6.6964803, 'position': '7r/p3kpp1/2p1p3/3n3p/5P2/2P3PP/PPq1N1Q1/3R1R1K w - - 2 24', 'color': 'green'}, {'x': 3.191678, 'y': -1.7052492, 'position': '8/pq4p1/8/3p4/kP1r4/P1P3PP/2Q5/5R1K b - - 1 37', 'color': 'green'}, {'x': -0.305036, 'y': -7.7849617, 'position': '3qk2r/p3npp1/1pp1pn2/2P4p/5P2/2P3PP/PP2N1Q1/R1B2R1K b k - 0 19', 'color': 'green'}, {'x': 3.0249336, 'y': -1.5754203, 'position': '8/pq4p1/8/1k1p4/1P1r4/P1P3PP/2Q5/5R1K w - - 2 38', 'color': 'green'}, {'x': -7.729403, 'y': -2.9543066, 'position': '4r3/p4k1p/3bN1pB/3P1p2/8/8/PP3PPP/4R1K1 w - - 1 26', 'color': 'green'}, {'x': -7.435306, 'y': -10.951809, 'position': 'rnbqkbnr/pp1ppppp/8/8/2Pp4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3', 'color': 'green'}, {'x': 2.9699576, 'y': -1.2076927, 'position': '8/pq4p1/8/1k1p4/1P1P4/P5PP/2Q5/5R1K b - - 0 38', 'color': 'green'}, {'x': -7.557279, 'y': -2.8504739, 'position': '4r3/p4k1p/3bN1pB/3P1p2/8/8/PP3PPP/2R3K1 b - - 2 26', 'color': 'green'}, {'x': -3.1323535, 'y': -9.618618, 'position': 'q3k1nr/p4ppp/1pp1pb2/4n3/8/3P2P1/PPP1NPQP/R1B1K2R b KQk - 3 12', 'color': 'green'}, {'x': 2.9632342, 'y': -1.0451562, 'position': '8/p3q1p1/8/1k1p4/1P1P4/P5PP/2Q5/5R1K w - - 1 39', 'color': 'green'}, {'x': -7.059497, 'y': -11.051312, 'position': 'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1', 'color': 'green'}, {'x': -1.1398137, 'y': -8.45155, 'position': '3qk2r/p3nppp/1pp1p3/8/3b1Pn1/3P2PP/PPP1N1Q1/R1B2R1K b k - 2 16', 'color': 'green'}, {'x': 0.2584084, 'y': -7.243708, 'position': '4k2r/p3npp1/2p1p3/2Bn3p/5P2/2Pq2PP/PP2N1Q1/R4R1K w k - 1 22', 'color': 'green'}, {'x': -6.154017, 'y': -10.776128, 'position': 'rnbqkbnr/ppp2ppp/4p3/3p4/4P3/3P4/PPPN1PPP/R1BQKBNR b KQkq - 1 3', 'color': 'green'}, {'x': 2.9501073, 'y': -1.0143012, 'position': '8/p3q1p1/8/1kQp4/1P1P4/P5PP/8/5R1K b - - 2 39', 'color': 'green'}, {'x': -7.522525, 'y': -2.733578, 'position': '4r3/p6p/3bNkpB/3P1p2/8/8/PP3PPP/2R3K1 w - - 3 27', 'color': 'green'}, {'x': -7.42535, 'y': -11.006867, 'position': 'rnbqkbnr/pp1ppppp/8/2p5/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2', 'color': 'green'}, {'x': -8.413528, 'y': -4.5789266, 'position': 'r3r1k1/p1q4p/3b2p1/5p2/3P4/3QBN2/PP3PPP/R3R1K1 w - - 2 19', 'color': 'green'}, {'x': 0.6631558, 'y': -6.6953616, 'position': '7r/p3kpp1/2p1p3/3R3p/5P2/2P3PP/PPq1N1Q1/5R1K b - - 0 24', 'color': 'green'}, {'x': -7.5547094, 'y': -2.6307974, 'position': '4r3/p6p/2RbNkpB/3P1p2/8/8/PP3PPP/6K1 b - - 4 27', 'color': 'green'}, {'x': -4.6105766, 'y': -10.505729, 'position': 'rn1qk1nr/pbp2ppp/1p2pb2/8/8/3P2P1/PPP2PBP/R1BQK1NR w KQkq - 0 8', 'color': 'green'}, {'x': -1.0217938, 'y': -8.360447, 'position': '3qk2r/p3nppp/1pp1pn2/8/3b1P2/3P2PP/PPP1N1Q1/R1B2R1K w k - 3 17', 'color': 'green'}, {'x': -0.18426436, 'y': -7.677541, 'position': '3qk2r/p3npp1/2p1pn2/2p4p/5P2/2P3PP/PP2N1Q1/R1B2R1K w k - 0 20', 'color': 'green'}, {'x': -8.367294, 'y': -4.7494564, 'position': 'r2qr1k1/p6p/3b2p1/5p2/3P4/3QBN2/PP3PPP/R3R1K1 b - - 1 18', 'color': 'green'}, {'x': -7.5744276, 'y': -2.4735525, 'position': '1r6/p6p/2RbNkpB/3P1p2/8/8/PP3PPP/6K1 w - - 5 28', 'color': 'green'}, {'x': -8.127819, 'y': -6.7159605, 'position': 'r2qrk2/p4ppp/3b4/5Q2/3P4/5N2/PP3PPP/R1B1K2R w KQ - 1 15', 'color': 'green'}, {'x': -7.518358, 'y': -2.3607543, 'position': '1r6/p6p/2RbNkp1/3P1pB1/8/8/PP3PPP/6K1 b - - 6 28', 'color': 'green'}]
+
+        console.log(`number of points: ${points.length}`)
+
+        const PLOT_WIDTH = 800
+        const PLOT_HEIGHT = 600
+        const POINT_SIZE = 3
+
+        // set plot size
+        let plot = document.getElementById("plot")
+        plot.setAttribute("width", PLOT_WIDTH)
+        plot.setAttribute("height", PLOT_HEIGHT)
+
+
+
+
+        // functions
+        function mapValue(value, fromLow, fromHigh, toLow, toHigh) {
+            return (value - fromLow) / (fromHigh - fromLow) * (toHigh - toLow) + toLow
+        }
+
+        function findHighestAndLowestValue(entries, getValue) {
+            let highest = Number.MIN_SAFE_INTEGER
+            let lowest = Number.MAX_SAFE_INTEGER
+
+            for (entry of entries) {
+                value = getValue(entry)
+                if (value > highest) {
+                    highest = value
+                }
+                if (value < lowest) {
+                    lowest = value
+                }
+            }
+
+            return [highest, lowest]
+        }
+
+        function mapPointsToPlot(points, plotWidth, plotHeight) {
+            let [highestX, lowestX] = findHighestAndLowestValue(points, point => point.x)
+            let [highestY, lowestY] = findHighestAndLowestValue(points, point => point.y)
+
+            for (point of points) {
+                point.x = mapValue(point.x, lowestX, highestX, 0, plotWidth)
+                point.y = mapValue(point.y, lowestY, highestY, 0, plotHeight)
+            }
+
+            return points
+        }
+
+        let mappedPoints = mapPointsToPlot(points, PLOT_WIDTH, PLOT_HEIGHT)
+
+
+        var svg = d3.select("svg");
+        let circles = svg.selectAll("circle")
+            .data(mappedPoints)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) { return d.x; })
+            .attr("cy", function (d) { return d.y; })
+            .attr("r", POINT_SIZE)
+            .attr("fill", function (d) { return d.color; })
+            .attr("class", "plotPoint");
+
+
+        const chess = new Chess()
+        let board = document.getElementById("board")
+        let previousBoard = document.getElementById("previousBoard")
+
+
+        board.innerHTML = "<pre>" + visualizeAsciiBoard(chess.ascii()) + "</pre>"
+        previousBoard.innerHTML = "<pre>" + visualizeAsciiBoard(chess.ascii()) + "</pre>"
+
+        circles.on("click", function (event, d) {
+            try {
+                previousBoard.innerHTML = board.innerHTML
+
+                chess.load(d.position)
+                ascii = chess.ascii()
+                console.log(chess.ascii())
+                board.innerHTML = "<pre>" + visualizeAsciiBoard(ascii) + "</pre>"
+            } catch (e) {
+                console.log(e)
+            }
+
+        });
+
+        function visualizeAsciiBoard(ascii) {
+            let inRow = false;
+            let isWhiteField = false
+
+            vis = ""
+            for (c of ascii) {
+                if (c === '|') {
+                    inRow = !inRow // inside / outside row
+
+                    if (inRow) {
+                        vis += "<div class='row'>"
+                    } else {
+                        vis += '</div>'
+                    }
+                }
+
+
+                if (inRow) {
+                    if (c === ' ') {
+                        continue
+                    }
+                    c = mapPieceCharField(c, isWhiteField)
+                    isWhiteField = !isWhiteField
+
+                    vis += c
+                }
+
+
+            }
+            return vis
+        }
+
+        function mapPieceCharField(c, isWhiteField) {
+            switch (c) {
+                case 'p': return createField("&#x265F;", isWhiteField)
+                case 'n': return createField("&#x265E;", isWhiteField)
+                case 'b': return createField("&#x265D;", isWhiteField)
+                case 'r': return createField("&#x265C;", isWhiteField)
+                case 'q': return createField("&#x265B;", isWhiteField)
+                case 'k': return createField("&#x265A;", isWhiteField)
+                case 'P': return createField("&#x2659;", isWhiteField)
+                case 'N': return createField("&#x2658;", isWhiteField)
+                case 'B': return createField("&#x2657;", isWhiteField)
+                case 'R': return createField("&#x2656;", isWhiteField)
+                case 'Q': return createField("&#x2655;", isWhiteField)
+                case 'K': return createField("&#x2654;", isWhiteField)
+                case '.': return createField(" ", isWhiteField)
+                default: return ""
+            }
+        }
+
+        function createField(unicode, isWhiteField) {
+            background = !isWhiteField ? "fieldWithBackground" : ""
+            return "<div class='pieceSquare " + background + "'>" + unicode + "</div>"
+        }
+
+
+    </script>
+</body>
+
+</html>

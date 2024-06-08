@@ -74,6 +74,13 @@ def info_board_to_FEN(info_board):
     return f"{active_player_FEN} {castling_right_FEN} {enpassant_FEN}"
 
 
+def info_vec_to_FEN(info_vec):
+    active_player_FEN = get_active_color_FEN_from_vec(info_vec[0])
+    castling_right_FEN = get_castling_rights_FEN_from_vec(info_vec[1:5])
+    enpassant_FEN = get_enpassant_FEN_from_vec(info_vec[5:11])
+    return f"{active_player_FEN} {castling_right_FEN} {enpassant_FEN}"
+
+
 def get_piece_index_at_position(bitboards, row, column):
 
     for index in range(len(bitboards[row][column])):
@@ -103,6 +110,9 @@ def get_castling_rights_FEN_from_vec(castling_right_vec):
 
     if castling_right_vec[3] == True:
         castling_right_string += "q"
+
+    if castling_right_string == "":
+        return "-"
 
     return castling_right_string
 
