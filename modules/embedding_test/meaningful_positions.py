@@ -31,13 +31,15 @@ def compare_played_and_random_moves(
     position_triplets = get_position_triplets(
         PGN_file, number_of_positions, number_of_moves
     )
-    compare_postition_distances(autoencoder, position_triplets, output_file)
+    compare_postition_distances(
+        autoencoder, position_triplets, output_file, number_of_moves
+    )
 
 
 def get_position_triplets(PGN_file, number_of_positions, number_of_moves):
     position_triplets = []
     games = PGNReader.get_games_of_PGN_file(PGN_file, number_of_positions)
-
+    # print(len(games))
     for game in games:
         position_triplet = get_base_and_played_and_random_position(
             game, number_of_moves
@@ -46,6 +48,7 @@ def get_position_triplets(PGN_file, number_of_positions, number_of_moves):
             continue
 
         position_triplets.append(position_triplet)
+    # print(f"triplet length {len(position_triplets)}")
     return position_triplets
 
 
@@ -97,7 +100,7 @@ def play_n_random_moves_from_position(fen: str, number_of_moves):
 
 
 def compare_postition_distances(
-    autoencoder: BaseAutoEncoder, position_triplets, output_file
+    autoencoder: BaseAutoEncoder, position_triplets, output_file, number_of_moves
 ):
 
     cummulative_dist_with_played_position = 0
@@ -132,6 +135,6 @@ def compare_postition_distances(
         position_triplets
     )
 
-    result_text = f"avg dist with played position: {avg_dist_with_played_position} and avg dist with random position: {avg_dist_with_random_position}"
+    result_text = f"moves after base: {number_of_moves} | avg dist with played position: {avg_dist_with_played_position} and avg dist with random position: {avg_dist_with_random_position} \n"
     print(result_text)
     output_file.write(result_text)

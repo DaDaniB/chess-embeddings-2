@@ -1,0 +1,62 @@
+######## test legal vs illegal #############
+Mean distance between illegal random positions and illegal random positions is: 16.758657455444336
+Mean distance between illegal random positions and legal positions is: 19.520244598388672
+Mean distance between legal positions and legal positions is: 14.949231147766113
+######################################
+
+######## test meaningful positions #########
+moves after base: 1 | avg dist with played position: 2.89339017868042 and avg dist with random position: 2.6146416664123535 
+moves after base: 2 | avg dist with played position: 4.122092247009277 and avg dist with random position: 3.821119785308838 
+moves after base: 3 | avg dist with played position: 5.12066125869751 and avg dist with random position: 4.655475616455078 
+moves after base: 4 | avg dist with played position: 5.81869649887085 and avg dist with random position: 5.463824272155762 
+moves after base: 5 | avg dist with played position: 6.416799068450928 and avg dist with random position: 6.053384780883789 
+moves after base: 6 | avg dist with played position: 6.910658836364746 and avg dist with random position: 6.44500207901001 
+moves after base: 7 | avg dist with played position: 7.4227614402771 and avg dist with random position: 6.990370750427246 
+moves after base: 8 | avg dist with played position: 7.936007976531982 and avg dist with random position: 7.391628742218018 
+moves after base: 9 | avg dist with played position: 8.354043960571289 and avg dist with random position: 7.734755516052246 
+moves after base: 10 | avg dist with played position: 8.64730453491211 and avg dist with random position: 8.062789916992188 
+######################################
+
+######## test opening positions ############
+Mean distance between e4 e5 Nf3 Nc6 Bc4 and e4 e5 Nf3 Nc6 Bc4 is: 9.059158325195312
+Mean distance between e4 e5 Nf3 Nc6 Bc4 and e4 e5 Nf3 Nc6 Bb5 is: 9.42138957977295
+Mean distance between e4 e5 Nf3 Nc6 Bb5 and e4 e5 Nf3 Nc6 Bb5 is: 9.052755355834961
+######################################
+
+######## test eco ##########################
+Mean distance between A and A is: 6.545883655548096
+Mean distance between A and B is: 7.343709468841553
+Mean distance between A and C is: 7.927588939666748
+Mean distance between A and D is: 7.697157859802246
+Mean distance between A and E is: 8.460392951965332
+Mean distance between B and B is: 7.414518356323242
+Mean distance between B and C is: 8.129331588745117
+Mean distance between B and D is: 8.051772117614746
+Mean distance between B and E is: 8.747481346130371
+Mean distance between C and C is: 8.171780586242676
+Mean distance between C and D is: 8.557841300964355
+Mean distance between C and E is: 9.073423385620117
+Mean distance between D and D is: 7.917864799499512
+Mean distance between D and E is: 8.401164054870605
+Mean distance between E and E is: 7.757449626922607
+######################################
+
+######## test tactics ######################
+Mean distance between anastasiaMate and anastasiaMate is: 14.2537841796875
+Mean distance between anastasiaMate and arabianMate is: 14.700316429138184
+Mean distance between anastasiaMate and backRankMate is: 14.345280647277832
+Mean distance between anastasiaMate and smotheredMate is: 15.174409866333008
+Mean distance between arabianMate and arabianMate is: 14.62834358215332
+Mean distance between arabianMate and backRankMate is: 14.905847549438477
+Mean distance between arabianMate and smotheredMate is: 15.76437759399414
+Mean distance between backRankMate and backRankMate is: 13.586064338684082
+Mean distance between backRankMate and smotheredMate is: 14.847593307495117
+Mean distance between smotheredMate and smotheredMate is: 14.22583293914795
+######################################
+
+######## expert players ####################
+Mean distance between ./data/expert-players/Carlsen/Carlsen.pgn and ./data/expert-players/Carlsen/Carlsen.pgn is: 15.450905799865723
+Mean distance between ./data/expert-players/Carlsen/Carlsen.pgn and ./data/expert-players/Tal/Tal.pgn is: 15.720502853393555
+Mean distance between ./data/expert-players/Tal/Tal.pgn and ./data/expert-players/Tal/Tal.pgn is: 15.901928901672363
+######################################
+

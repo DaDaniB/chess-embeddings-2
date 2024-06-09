@@ -1,3 +1,5 @@
+import time
+
 from modules.autoencoder.base_autoencoder import BaseAutoEncoder
 from modules.embedding_test.illegal_positions_generator import (
     Illegal_Positions_Generator,
@@ -75,6 +77,14 @@ class EmbeddingTester:
         illegal_position_FENs = Illegal_Positions_Generator.generate_FENs(
             self.test_amount, True
         )
+
+        ##### test
+        white_king_count = 0
+        for fen in illegal_position_FENs:
+            if "K" in fen.piece_data:
+                white_king_count += 1
+        print(f"counted white king: {white_king_count} times")
+
         legal_position_FENs = PGNReader.read_unique_positions_from_file(
             self.PGN_file, self.test_amount
         )
@@ -86,9 +96,14 @@ class EmbeddingTester:
         self.compare_sets(position_sets, "legal vs illegal test", output_file)
 
     def test_meaningful_positions(self, output_file):
-        meaningful_positions.compare_played_and_random_moves(
-            self.autoencoder, self.PGN_file, self.test_amount, 1, output_file
-        )
+        for i in range(10):
+            meaningful_positions.compare_played_and_random_moves(
+                self.autoencoder,
+                self.PGN_file,
+                self.test_amount / 10,
+                i + 1,
+                output_file,
+            )
 
     def test_opening_positions(self, output_file):
         MOVES_AFTER_OPENING = 10
@@ -147,8 +162,11 @@ class EmbeddingTester:
     def wrap_test_with_print(self, test, test_start_text, output_file):
         print(test_start_text)
         output_file.write(test_start_text)
+        start_time = time.time()
+        print(f"start time {str(start_time)}")
 
         test(output_file)
 
+        print(f"end time {str(time.time() - start_time)}")
         print(TEST_END_TEXT)
         output_file.write(TEST_END_TEXT)

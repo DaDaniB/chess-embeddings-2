@@ -14,3 +14,7 @@ DATA_TYPE = np.bool_
 TF_DATA_TYPE = tf.float32
 
 MODELS_SAVE_DIR = "./models"
+
+CONVOLUTIONAL_FIRST_DIM = 8  # columns
+CONVOLUTIONAL_SECOND_DIM = 8  # rows
+CONVOLUTIONAL_THIRD_DIM = 12  # 12 chess pieces

@@ -1,6 +1,0 @@
-######## test legal vs illegal #############
-Mean distance between illegal random positions and illegal random positions is: 5.42985725402832
-Mean distance between illegal random positions and legal positions is: 5.94698429107666
-Mean distance between legal positions and legal positions is: 5.664028167724609
-######################################
-

@@ -13,24 +13,55 @@ from modules.autoencoder.autoencoder_noencode import Autoencoder_NoEncode
 from modules.autoencoder.custom_autoencoder.autoencoder_linear_16 import (
     Autoencoder_Linear16,
 )
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_32 import (
+    Autoencoder_Linear32,
+)
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_64 import (
+    Autoencoder_Linear64,
+)
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_128 import (
+    Autoencoder_Linear128,
+)
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_16_2layers import (
+    Autoencoder_Linear16_2layers,
+)
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_32_2layers import (
+    Autoencoder_Linear32_2layers,
+)
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_64_2layers import (
+    Autoencoder_Linear64_2layers,
+)
+from modules.autoencoder.custom_autoencoder.autoencoder_linear_128_2layers import (
+    Autoencoder_Linear128_2layers,
+)
+from modules.autoencoder.custom_autoencoder.convolutional.autoencoder_convolutional_16F_5k import (
+    Autoencoder_Convolutional_16F_5K,
+)
+from modules.autoencoder.custom_autoencoder.convolutional.autoencoder_convolutional_128F_5k import (
+    Autoencoder_Convolutional_128F_5K,
+)
 
+###### ENV ######################
 load_dotenv()
 PGN_FILE = os.getenv("PGN_FILE")
-TEST_FEN = "r1bqkb1r/pp2pp1p/2np1np1/8/3NP3/2NB4/PPP2PPP/R1BQ1RK1 b kq - 1 7"
 
-# vector = FENConverter.to_bitboards_with_info(FEN(TEST_FEN))
-# print(TEST_FEN)
-# of = FENConverter.bitboards_with_info_to_FEN(vector)
-# print(of)
 
-autoencoder = Autoencoder_NoEncode()
-autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-
+###### AUTOENCODER ##############
+# autoencoder = Autoencoder_NoEncode()
 # autoencoder = Autoencoder_Linear16()
+# autoencoder = Autoencoder_Linear32()
+# autoencoder = Autoencoder_Linear64()
+# autoencoder = Autoencoder_Linear128()
+# autoencoder = Autoencoder_Linear16_2layers()
+# autoencoder = Autoencoder_Linear32_2layers()
+# autoencoder = Autoencoder_Linear64_2layers()
+# autoencoder = Autoencoder_Linear128_2layers()
+# autoencoder = Autoencoder_Convolutional_16F_5K()
+autoencoder = Autoencoder_Convolutional_128F_5K()
 
-# ############# compile and train
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 1000, chunk_size=10)
+###### compile and train ########
+autoencoder.compile(optimizer="adam", loss="mean_squared_error")
+autoencoder.train(PGN_FILE, 1000000, chunk_size=10000, epochs=4)
 
 tester = EmbeddingTester(autoencoder, PGN_FILE)
 tester.test_all()
