@@ -23,22 +23,34 @@ class Autoencoder_Convolutional_16F_5K(BaseAutoEncoder):
                         constants.CONVOLUTIONAL_THIRD_DIM,
                     )
                 ),
-                layers.Conv2D(NUM_FILTERS, kernel_size=KERNEL_SIZE, padding="same"),
+                layers.Conv2D(
+                    NUM_FILTERS,
+                    activation="relu",
+                    kernel_size=KERNEL_SIZE,
+                    padding="same",
+                ),
                 layers.Conv2D(NUM_FILTERS, kernel_size=KERNEL_SIZE, padding="same"),
             ]
         )
         self.decoder = tf.keras.Sequential(
             [
                 layers.Conv2DTranspose(
-                    NUM_FILTERS, kernel_size=KERNEL_SIZE, padding="same"
+                    NUM_FILTERS,
+                    activation="relu",
+                    kernel_size=KERNEL_SIZE,
+                    padding="same",
                 ),
                 layers.Conv2DTranspose(
-                    NUM_FILTERS, kernel_size=KERNEL_SIZE, padding="same"
+                    NUM_FILTERS,
+                    activation="relu",
+                    kernel_size=KERNEL_SIZE,
+                    padding="same",
                 ),
                 layers.Conv2D(
                     constants.CONVOLUTIONAL_THIRD_DIM,
                     kernel_size=KERNEL_SIZE,
                     padding="same",
+                    activation="relu",
                 ),
             ]
         )

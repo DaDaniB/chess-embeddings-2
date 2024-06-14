@@ -1,0 +1,9 @@
+######## test mate #########################
+Mean distance between before mate and before mate is: 5.158688545227051
+Mean distance between before mate and mate is: 5.093207836151123
+Mean distance between mate and mate is: 5.022090911865234
+Mean cosine similarity between before mate and before mate is: 0.26837852597236633
+Mean cosine similarity between before mate and mate is: 0.27139830589294434
+Mean cosine similarity between mate and mate is: 0.2759064733982086
+######################################
+

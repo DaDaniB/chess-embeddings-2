@@ -18,7 +18,7 @@ from modules.embedding_test import (
 )
 from modules.visualization.TSNE_visualizer import TSNEVisualizer
 
-TEST_AMOUNT = 10000
+TEST_AMOUNT = 5000
 VISUALIZATION_AMOUNT = 1000
 
 
@@ -36,41 +36,47 @@ class EmbeddingTester:
         results_file_name = "output_" + self.autoencoder.__class__.__name__ + ".txt"
         with open(results_file_name, "w") as output_file:
 
+            # self.wrap_test_with_print(
+            #     self.test_legal_vs_illegal_positions,
+            #     "######## test legal vs illegal #############\n",
+            #     output_file,
+            # )
+
+            # self.wrap_test_with_print(
+            #     self.test_meaningful_positions,
+            #     "######## test meaningful positions #########\n",
+            #     output_file,
+            # )
+
+            # self.wrap_test_with_print(
+            #     self.test_opening_positions,
+            #     "######## test opening positions ############\n",
+            #     output_file,
+            # )
+
+            # self.wrap_test_with_print(
+            #     self.test_eco,
+            #     "######## test eco ##########################\n",
+            #     output_file,
+            # )
+
+            # self.wrap_test_with_print(
+            #     self.test_tactics,
+            #     "######## test tactics ######################\n",
+            #     output_file,
+            # )
+
             self.wrap_test_with_print(
-                self.test_legal_vs_illegal_positions,
-                "######## test legal vs illegal #############\n",
+                self.test_before_mate_and_mate,
+                "######## test mate #########################\n",
                 output_file,
             )
 
-            self.wrap_test_with_print(
-                self.test_meaningful_positions,
-                "######## test meaningful positions #########\n",
-                output_file,
-            )
-
-            self.wrap_test_with_print(
-                self.test_opening_positions,
-                "######## test opening positions ############\n",
-                output_file,
-            )
-
-            self.wrap_test_with_print(
-                self.test_eco,
-                "######## test eco ##########################\n",
-                output_file,
-            )
-
-            self.wrap_test_with_print(
-                self.test_tactics,
-                "######## test tactics ######################\n",
-                output_file,
-            )
-
-            self.wrap_test_with_print(
-                self.test_expert_players,
-                "######## expert players ####################\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_expert_players,
+            #     "######## expert players ####################\n",
+            #     output_file,
+            # )
 
     def test_legal_vs_illegal_positions(self, output_file):
 
@@ -110,11 +116,43 @@ class EmbeddingTester:
 
         opening_sets = opening_extractor.extract_opening_position(
             self.PGN_file,
-            [["e4", "e5", "Nf3", "Nc6", "Bc4"], ["e4", "e5", "Nf3", "Nc6", "Bb5"]],
+            [["e4"], ["d4"]],
             MOVES_AFTER_OPENING,
             self.test_amount,
         )
         self.compare_sets(opening_sets, "opening_test", output_file)
+
+        opening_sets = opening_extractor.extract_opening_position(
+            self.PGN_file,
+            [["e4", "e5", "Nf3", "Nc6", "Bc4"], ["e4", "e5", "Nf3", "Nc6", "Bb5"]],
+            MOVES_AFTER_OPENING,
+            self.test_amount,
+        )
+        self.compare_sets(opening_sets, "long_opening_test", output_file)
+
+        # opening_sets = opening_extractor.extract_opening_position(
+        #     self.PGN_file,
+        #     [
+        #         [
+        #             "d4",
+        #             "Nf6",
+        #             "c4",
+        #             "g6",
+        #             "Nc3",
+        #             "d5",
+        #             "cxd5",
+        #             "Nxd5",
+        #             "e4",
+        #             "Nxc3",
+        #             "bxc3",
+        #             "Bg7",
+        #         ],
+        #         ["e4", "c5", "Nf3", "d6", "d4", "cxd4", "Nxd4", "Nf6", "Nc3", "g6"],
+        #     ],
+        #     MOVES_AFTER_OPENING,
+        #     self.test_amount,
+        # )
+        # self.compare_sets(opening_sets, "opening_test", output_file)
 
     def test_eco(self, output_file):
         ECO_FILE = "./data/openings_sheet.csv"
@@ -133,6 +171,15 @@ class EmbeddingTester:
             TACTICS_FILE, tactics, self.test_amount
         )
         self.compare_sets(tactics_sets, "tactics_test", output_file)
+
+    def test_before_mate_and_mate(self, output_file):
+        TACTICS_FILE = "./data/lichess_db_puzzle.csv.zst"
+        tactic = "backRankMate"
+
+        mate_sets = tactics_reader.get_before_mate_and_mate_sets(
+            TACTICS_FILE, tactic, 2000
+        )
+        self.compare_sets(mate_sets, "mate_test", output_file)
 
     def test_expert_players(self, output_file):
         FROM_MOVE = 10

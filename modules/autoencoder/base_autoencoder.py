@@ -59,7 +59,7 @@ class BaseAutoEncoder(tf.keras.models.Model, ABC):
         self.save(savename)
 
     def get_position_vectors_from_PGN(self, PGN_file: str, num_positions: int):
-        FEN_positions = PGNReader.read_unique_positions_from_file(
+        FEN_positions = PGNReader.read_unique_positions_from_file_fast(
             PGN_file, num_positions
         )
 

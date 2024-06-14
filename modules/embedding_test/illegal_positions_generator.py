@@ -93,7 +93,7 @@ class Illegal_Positions_Generator:
 
     @staticmethod
     def generate_distribution():
-        sum_of_all_pieces = random.randint(0, 32)
+        sum_of_all_pieces = random.randint(0, 32)  # 32 is the number of all pieces
         distribution = np.random.multinomial(
             sum_of_all_pieces,
             np.ones(constants.DIFFERENT_PIECES) / constants.DIFFERENT_PIECES,

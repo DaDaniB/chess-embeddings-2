@@ -10,6 +10,7 @@ from modules.vectorization.FEN import FEN
 
 LATENT_DIM = 16
 INPUT_SIZE = constants.VECTOR_LENGTH
+ACTIVATION = "relu"
 
 
 class Autoencoder_Linear16(BaseAutoEncoder):
@@ -20,7 +21,7 @@ class Autoencoder_Linear16(BaseAutoEncoder):
         self.encoder = tf.keras.Sequential(
             [
                 layers.InputLayer(input_shape=(INPUT_SIZE,)),
-                layers.Dense(LATENT_DIM),
+                layers.Dense(LATENT_DIM, activation="relu"),
             ]
         )
         self.decoder = tf.keras.Sequential(
@@ -33,7 +34,7 @@ class Autoencoder_Linear16(BaseAutoEncoder):
         return decoded
 
     def load_weights(self, filepath):
-        self.build((None, self.input_size))
+        self.build((None, INPUT_SIZE))
         super(Autoencoder_Linear16, self).load_weights(filepath)
 
     def vectorize_FEN(self, fen: FEN):

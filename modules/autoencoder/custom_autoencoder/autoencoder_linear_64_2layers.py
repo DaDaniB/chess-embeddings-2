@@ -20,12 +20,15 @@ class Autoencoder_Linear64_2layers(BaseAutoEncoder):
         self.encoder = tf.keras.Sequential(
             [
                 layers.InputLayer(input_shape=(INPUT_SIZE,)),
-                layers.Dense(LATENT_DIM),
+                layers.Dense(LATENT_DIM, activation="relu"),
                 layers.Dense(LATENT_DIM),
             ]
         )
         self.decoder = tf.keras.Sequential(
-            [layers.Dense(LATENT_DIM), layers.Dense(INPUT_SIZE, activation="relu")]
+            [
+                layers.Dense(LATENT_DIM, activation="relu"),
+                layers.Dense(INPUT_SIZE, activation="relu"),
+            ]
         )
 
     def call(self, x):

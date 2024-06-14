@@ -1,6 +1,7 @@
 import chess.pgn
 from modules.embedding_test.position_set import PositionSet
 from modules.vectorization.FEN import FEN
+import io
 
 
 def extract_opening_position(
@@ -44,6 +45,41 @@ def get_opening_positions(
             )
             if positions_after_opening:
                 unique_opening_positions.update(positions_after_opening)
+
+        return unique_opening_positions
+
+
+def get_opening_positions_fast(
+    PGN_file,
+    opening: list[str],
+    max_moves_after_opening,
+    num_positions,
+    chunk_size=1024 * 1024 * 10,
+):
+    unique_opening_positions = set()
+
+    with open(PGN_file) as file:
+        buffer = ""
+        while len(unique_opening_positions) < num_positions:
+
+            chunk = file.read(chunk_size)
+            if not chunk:
+                break
+            buffer += chunk
+
+            splitter = "[Event"
+            games = [splitter + text for text in buffer.split(splitter) if text]
+            buffer = games.pop()
+
+            for game_text in games:
+                game_io = io.StringIO(game_text)
+                game = chess.pgn.read_game(game_io)
+                if game is not None:
+                    positions_after_opening = get_positions_after_opening(
+                        game, opening, max_moves_after_opening
+                    )
+                    if positions_after_opening:
+                        unique_opening_positions.update(positions_after_opening)
 
         return unique_opening_positions
 

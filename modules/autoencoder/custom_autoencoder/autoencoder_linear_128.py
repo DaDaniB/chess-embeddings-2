@@ -20,7 +20,7 @@ class Autoencoder_Linear128(BaseAutoEncoder):
         self.encoder = tf.keras.Sequential(
             [
                 layers.InputLayer(input_shape=(INPUT_SIZE,)),
-                layers.Dense(LATENT_DIM),
+                layers.Dense(LATENT_DIM, activation="relu"),
             ]
         )
         self.decoder = tf.keras.Sequential(
@@ -33,7 +33,7 @@ class Autoencoder_Linear128(BaseAutoEncoder):
         return decoded
 
     def load_weights(self, filepath):
-        self.build((None, self.input_size))
+        self.build((None, INPUT_SIZE))
         super(Autoencoder_Linear128, self).load_weights(filepath)
 
     def vectorize_FEN(self, fen: FEN):
