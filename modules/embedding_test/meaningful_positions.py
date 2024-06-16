@@ -6,6 +6,7 @@ import tensorflow as tf
 from modules.PGN_reader import PGNReader
 from modules.autoencoder.base_autoencoder import BaseAutoEncoder
 from modules.vectorization.FEN import FEN
+from modules.embedding_test.position_set import PositionSet
 
 BASE_POSITION_MOVE_RANGE = (
     20  # the base position is in range of 0 - 20 moves into the game
@@ -34,6 +35,17 @@ def compare_played_and_random_moves(
     compare_postition_distances(
         autoencoder, position_triplets, output_file, number_of_moves
     )
+
+    played_positions = []
+    random_positions = []
+    for position_tripled in position_triplets:
+        played_positions.append(position_tripled.played_position)
+        random_positions.append(position_tripled.random_position)
+
+    return [
+        PositionSet("played positions", played_positions, "green"),
+        PositionSet("random_positions", random_positions, "red"),
+    ]
 
 
 def get_position_triplets(PGN_file, number_of_positions, number_of_moves):

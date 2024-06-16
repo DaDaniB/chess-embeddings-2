@@ -4,6 +4,7 @@ import chess
 
 from modules.embedding_test.position_set import PositionSet
 from modules.vectorization.FEN import FEN
+from modules.PGN_reader import PGNReader
 
 
 def get_before_mate_and_mate_sets(
@@ -50,6 +51,87 @@ def contains_tactic(themes: str, tactic: str):
             return True
 
     return False
+
+
+def get_random_and_mate(tactics_file_src: str, PGN_file: str, num_positions: int):
+
+    mate_positions = []
+
+    df = pandas.read_csv(tactics_file_src)
+    for index, row in df.iterrows():
+
+        themes = row["Themes"]
+        if themes is None or themes == " " or str(themes) == "nan":
+            continue
+
+        if contains_tactic(themes, "mateIn1"):
+            before_mate_position = row["FEN"]
+            moves = row["Moves"].split(" ")
+
+            enemy_move = moves[0]
+            mate_move = moves[1]
+
+            board = chess.Board(before_mate_position)
+            board.push_uci(enemy_move)
+            board.push_uci(mate_move)
+
+            mate_positions.append(FEN(board.fen()))
+
+        if len(mate_positions) > num_positions:
+            break
+
+    return [
+        PositionSet(
+            "random positions",
+            PGNReader.read_very_unique_positions_from_file(PGN_file, num_positions),
+            "red",
+        ),
+        PositionSet("mate positions", mate_positions, "green"),
+    ]
+
+
+def get_random_and_mates(tactics_file_src: str, PGN_file: str, num_positions: int):
+
+    white_mate_positions = []
+    black_mate_positions = []
+
+    df = pandas.read_csv(tactics_file_src)
+    for index, row in df.iterrows():
+
+        themes = row["Themes"]
+        if themes is None or themes == " " or str(themes) == "nan":
+            continue
+
+        if contains_tactic(themes, "mateIn1"):
+            before_mate_position = row["FEN"]
+
+            moves = row["Moves"].split(" ")
+
+            enemy_move = moves[0]
+            mate_move = moves[1]
+
+            board = chess.Board(before_mate_position)
+            board.push_uci(enemy_move)
+            board.push_uci(mate_move)
+
+            before_mate_FEN = FEN(before_mate_position)
+            if before_mate_FEN.active_color_data == "w":
+                white_mate_positions.append(FEN(board.fen()))
+            else:
+                black_mate_positions.append(FEN(board.fen()))
+
+        if len(white_mate_positions) > num_positions:
+            break
+
+    return [
+        PositionSet(
+            "random positions",
+            PGNReader.read_very_unique_positions_from_file(PGN_file, num_positions),
+            "black",
+        ),
+        PositionSet("white mate positions", white_mate_positions, "green"),
+        PositionSet("black mate positions", black_mate_positions, "red"),
+    ]
 
 
 def convert_tactics_file_to_position_sets(

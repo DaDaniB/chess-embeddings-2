@@ -6,15 +6,15 @@ from modules.FEN_converter import FENConverter
 from modules import constants
 
 
-class Autoencoder_Convolutional_GPT2(BaseAutoEncoder):
+class Autoencoder_Convolutional_GPT3(BaseAutoEncoder):
     def __init__(self):
-        super(Autoencoder_Convolutional_GPT2, self).__init__()
+        super(Autoencoder_Convolutional_GPT3, self).__init__()
 
         self.encoder = tf.keras.Sequential(
             [
                 layers.Input(shape=(8, 8, 12)),
                 layers.Conv2D(
-                    256,
+                    64,
                     (3, 3),
                     activation="relu",
                     padding="same",
@@ -38,7 +38,7 @@ class Autoencoder_Convolutional_GPT2(BaseAutoEncoder):
                     padding="same",
                 ),
                 layers.Conv2DTranspose(
-                    256, (3, 3), activation="relu", strides=2, padding="same"
+                    64, (3, 3), activation="relu", strides=2, padding="same"
                 ),
                 layers.Conv2DTranspose(
                     12, (3, 3), activation="sigmoid", padding="same"
@@ -60,7 +60,7 @@ class Autoencoder_Convolutional_GPT2(BaseAutoEncoder):
                 constants.CONVOLUTIONAL_THIRD_DIM,
             )
         )
-        super(Autoencoder_Convolutional_GPT2, self).load_weights(filepath)
+        super(Autoencoder_Convolutional_GPT3, self).load_weights(filepath)
 
     def vectorize_FEN(self, fen: str):
         return FENConverter.to_bitboards(fen)

@@ -36,35 +36,35 @@ class EmbeddingTester:
         results_file_name = "output_" + self.autoencoder.__class__.__name__ + ".txt"
         with open(results_file_name, "w") as output_file:
 
-            # self.wrap_test_with_print(
-            #     self.test_legal_vs_illegal_positions,
-            #     "######## test legal vs illegal #############\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_legal_vs_illegal_positions,
+                "######## test legal vs illegal #############\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_meaningful_positions,
-            #     "######## test meaningful positions #########\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_meaningful_positions,
+                "######## test meaningful positions #########\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_opening_positions,
-            #     "######## test opening positions ############\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_opening_positions,
+                "######## test opening positions ############\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_eco,
-            #     "######## test eco ##########################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_eco,
+                "######## test eco ##########################\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_tactics,
-            #     "######## test tactics ######################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_tactics,
+                "######## test tactics ######################\n",
+                output_file,
+            )
 
             self.wrap_test_with_print(
                 self.test_before_mate_and_mate,
@@ -72,11 +72,17 @@ class EmbeddingTester:
                 output_file,
             )
 
-            # self.wrap_test_with_print(
-            #     self.test_expert_players,
-            #     "######## expert players ####################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_random_and_mates,
+                "######## test mate #########################\n",
+                output_file,
+            )
+
+            self.wrap_test_with_print(
+                self.test_expert_players,
+                "######## expert players ####################\n",
+                output_file,
+            )
 
     def test_legal_vs_illegal_positions(self, output_file):
 
@@ -91,7 +97,7 @@ class EmbeddingTester:
                 white_king_count += 1
         print(f"counted white king: {white_king_count} times")
 
-        legal_position_FENs = PGNReader.read_unique_positions_from_file(
+        legal_position_FENs = PGNReader.read_very_unique_positions_from_file(
             self.PGN_file, self.test_amount
         )
 
@@ -103,13 +109,14 @@ class EmbeddingTester:
 
     def test_meaningful_positions(self, output_file):
         for i in range(10):
-            meaningful_positions.compare_played_and_random_moves(
+            position_sets = meaningful_positions.compare_played_and_random_moves(
                 self.autoencoder,
                 self.PGN_file,
                 self.test_amount / 10,
                 i + 1,
                 output_file,
             )
+            self.compare_sets(position_sets, f"meaningful_positions{i}", output_file)
 
     def test_opening_positions(self, output_file):
         MOVES_AFTER_OPENING = 10
@@ -181,8 +188,14 @@ class EmbeddingTester:
         )
         self.compare_sets(mate_sets, "mate_test", output_file)
 
+    def test_random_and_mates(self, output_file):
+        TACTICS_FILE = "./data/lichess_db_puzzle.csv.zst"
+
+        sets = tactics_reader.get_random_and_mates(TACTICS_FILE, self.PGN_file, 10000)
+        self.compare_sets(sets, "mate_random_test", output_file, 10000)
+
     def test_expert_players(self, output_file):
-        FROM_MOVE = 10
+        FROM_MOVE = 20
         CARLSEN_FILE = "./data/expert-players/Carlsen/Carlsen.pgn"
         TAL_FILE = "./data/expert-players/Tal/Tal.pgn"
 
@@ -194,7 +207,11 @@ class EmbeddingTester:
         )
 
     def compare_sets(
-        self, position_sets: list[PositionSet], tsne_file_name: str, output_file
+        self,
+        position_sets: list[PositionSet],
+        tsne_file_name: str,
+        output_file,
+        num_visualize: int = VISUALIZATION_AMOUNT,
     ):
         PositionDistanceCalculator.calculate_distances(
             self.autoencoder, position_sets, output_file
@@ -203,7 +220,7 @@ class EmbeddingTester:
             self.autoencoder,
             position_sets,
             visualization_file_name=tsne_file_name,
-            num_points_to_visualize=VISUALIZATION_AMOUNT,
+            num_points_to_visualize=num_visualize,
         )
 
     def wrap_test_with_print(self, test, test_start_text, output_file):

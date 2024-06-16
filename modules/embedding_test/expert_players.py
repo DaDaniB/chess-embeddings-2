@@ -9,10 +9,10 @@ def get_expert_player_positions(
     player_a_PGN_file, player_b_PGN_file, num_positions, from_move
 ):
 
-    player_a_positions = PGNReader.read_unique_positions_from_file(
+    player_a_positions = PGNReader.read_very_unique_positions_from_file(
         player_a_PGN_file, num_positions, from_move
     )
-    player_b_positions = PGNReader.read_unique_positions_from_file(
+    player_b_positions = PGNReader.read_very_unique_positions_from_file(
         player_b_PGN_file, num_positions, from_move
     )
 

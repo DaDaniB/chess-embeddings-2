@@ -19,6 +19,7 @@
             <div id="previousBoard" class="board"></div>
         </div>
     </div>
+    <div id="togglePointsBox"></div>
 
     <style>
         body {
@@ -41,6 +42,7 @@
 
         .plotPoint {
             cursor: pointer;
+            opacity: 0.5;
         }
 
         .board {
@@ -69,6 +71,28 @@
 
         .fieldWithBackground {
             background-color: brown;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #togglePointsBox {
+            display: flex;
+            flex-flow: row;
+            width: 100vw;
+        }
+
+        .toggleBtn {
+            width: 5rem;
+            height: 3rem;
+            border: 1px solid black;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 3rem;
+            cursor: pointer;
+            margin: 0 2rem;
+            background: lightgrey;
         }
     </style>
     <script>
@@ -122,6 +146,8 @@
 
         let mappedPoints = mapPointsToPlot(points, PLOT_WIDTH, PLOT_HEIGHT)
 
+        const COLOR_CLASS_PREFIX = "color_"
+
         var svg = d3.select("svg");
         let circles = svg.selectAll("circle")
             .data(mappedPoints)
@@ -131,8 +157,31 @@
             .attr("cy", function (d) { return d.y; })
             .attr("r", POINT_SIZE)
             .attr("fill", function (d) { return d.color; })
-            .attr("class", "plotPoint");
+            .attr("class", function (d) { return "plotPoint " + COLOR_CLASS_PREFIX + d.color });
 
+        let allColors = []
+        for (point of points) {
+            if (!allColors.includes(point.color)) {
+                allColors.push(point.color)
+            }
+        }
+
+        let togglePointsBox = document.getElementById("togglePointsBox")
+        for (color of allColors) {
+
+            let colorToggleBtn = document.createElement('div')
+            colorToggleBtn.className = "toggleBtn"
+            colorToggleBtn.innerHTML = color
+            const colorClass = color
+            colorToggleBtn.addEventListener('click', () => {
+                allColorPoints = document.querySelectorAll("." + COLOR_CLASS_PREFIX + colorClass)
+                console.log(colorClass)
+                allColorPoints.forEach(e => {
+                    e.classList.toggle('hidden')
+                })
+            })
+            togglePointsBox.append(colorToggleBtn)
+        }
 
         let board = document.getElementById("board")
         let previousBoard = document.getElementById("previousBoard")
