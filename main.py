@@ -32,6 +32,9 @@ from modules.autoencoder.paper.autoencoder_convolutional_normal_nocomp import (
 from modules.autoencoder.paper.autoencoder_convolutional_normal_safe import (
     Autoencoder_Convolutional_normal_safe,
 )
+from modules.autoencoder.paper.autoencoder_convolutional_normal_double_filters import (
+    Autoencoder_Convolutional_normal_double_filters
+)
 
 
 ###### ENV ######################
@@ -52,17 +55,16 @@ PGN_FILE = os.getenv("PGN_FILE")
 # autoencoder = Autoencoder_Convolutional_Simple64_2()
 # autoencoder = Autoencoder_Convolutional_normal()
 # autoencoder = Autoencoder_Convolutional_normal_nocomp()
-autoencoder = Autoencoder_Convolutional_normal_safe()
+# autoencoder = Autoencoder_Convolutional_normal_safe()
+autoencoder = Autoencoder_Convolutional_normal_double_filters()
 
 ###### compile ##################
-custom_optimizer = Adam(learning_rate=1e-4, clipnorm=1.0)
-autoencoder.compile(optimizer=custom_optimizer, loss="mean_squared_error")
+# custom_optimizer = Adam(learning_rate=1e-4, clipnorm=1.0)
+autoencoder.compile(optimizer="adam", loss="mean_squared_error")
 
 ###### load weights #############
 # autoencoder.load_weights("./models/Autoencoder_Linear16nPositions1000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear128nPositions1000000.h5")
-# autoencoder.load_weights("./models/Autoencoder_Convolutional_GPTnPositions1000000.h5")
-# autoencoder.load_weights("./models/Autoencoder_Convolutional_GPT2nPositions2000000.h5")
 # autoencoder.load_weights(
 #     "./models/Autoencoder_Convolutional_Simple128nPositions500000.h5"
 # )
@@ -78,45 +80,12 @@ autoencoder.compile(optimizer=custom_optimizer, loss="mean_squared_error")
 # autoencoder.load_weights("./models/Autoencoder_Linear64nPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear32nPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear16nPositions3000000.h5")
-autoencoder.load_weights(
-    "./models/Autoencoder_Convolutional_normal_safenPositions3000000.h5"
-)
+# autoencoder.load_weights(
+#     "./models/Autoencoder_Convolutional_normal_safenPositions3000000.h5"
+# )
 
 ###### train ####################
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=25000, epochs=4)
+autoencoder.train(PGN_FILE, 3000000, chunk_size=25000, epochs=4)
 
 tester = EmbeddingTester(autoencoder, PGN_FILE)
 tester.test_all()
-
-# autoencoder = Autoencoder_Convolutional_normal()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-
-# autoencoder = Autoencoder_Linear16()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-# autoencoder = Autoencoder_Linear32()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-# autoencoder = Autoencoder_Linear64()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-# autoencoder = Autoencoder_Linear128()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-# autoencoder = Autoencoder_Linear128_4layers()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-# autoencoder = Autoencoder_Linear128_multiple()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)
-
-# autoencoder = Autoencoder_Convolutional_normal_nocomp()
-# autoencoder.compile(optimizer="adam", loss="mean_squared_error")
-# autoencoder.train(PGN_FILE, 3000000, chunk_size=50000, epochs=4)

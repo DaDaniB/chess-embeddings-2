@@ -203,7 +203,10 @@ class EmbeddingTester:
             CARLSEN_FILE, TAL_FILE, self.test_amount, FROM_MOVE
         )
         self.compare_sets(
-            expert_player_position_sets, "expert_player_test", output_file
+            expert_player_position_sets,
+            "expert_player_test",
+            output_file,
+            self.test_amount,
         )
 
     def compare_sets(

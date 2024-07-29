@@ -155,7 +155,14 @@ def convert_tactics_file_to_position_sets(
         ):
             continue
 
-        tactics_positions_sets[tactics_category_as_index].append(FEN(row["FEN"]))
+        moves = row["Moves"].split(" ")
+        base_positions = row["FEN"]
+        board = chess.Board(base_positions)
+        for move in moves:
+
+            board.push_uci(move)
+
+        tactics_positions_sets[tactics_category_as_index].append(FEN(board.fen()))
 
         amount_all_positions = 0
         for tactic_position_set in tactics_positions_sets:

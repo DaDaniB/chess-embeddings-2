@@ -33,7 +33,7 @@ class Autoencoder_Linear32(BaseAutoEncoder):
         return decoded
 
     def load_weights(self, filepath):
-        self.build((None, LATENT_DIM))
+        self.build((None, INPUT_SIZE))
         super(Autoencoder_Linear32, self).load_weights(filepath)
 
     def vectorize_FEN(self, fen: FEN):
