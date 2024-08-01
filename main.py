@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import tensorflow as tf
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD, Adam
 
 from modules.PGN_reader import PGNReader
 from modules.FEN_converter import FENConverter
@@ -33,16 +33,20 @@ from modules.autoencoder.paper.autoencoder_convolutional_normal_safe import (
     Autoencoder_Convolutional_normal_safe,
 )
 from modules.autoencoder.paper.autoencoder_convolutional_normal_double_filters import (
-    Autoencoder_Convolutional_normal_double_filters
+    Autoencoder_Convolutional_normal_double_filters,
+)
+from modules.autoencoder.paper.autoencoder_convolutional_simple import (
+    Autoencoder_Convolutional_Simple,
 )
 
 
-###### ENV ######################
+###### ENV ########################################################################################################
 load_dotenv()
 PGN_FILE = os.getenv("PGN_FILE")
+TXT_FILE = "./data/extracted.txt"
 
 
-###### AUTOENCODER ##############
+###### AUTOENCODER ################################################################################################
 # autoencoder = Autoencoder_NoEncode()
 # autoencoder = Autoencoder_Linear16()
 # autoencoder = Autoencoder_Linear32()
@@ -50,21 +54,21 @@ PGN_FILE = os.getenv("PGN_FILE")
 # autoencoder = Autoencoder_Linear128()
 # autoencoder = Autoencoder_Linear128_4layers()
 # autoencoder = Autoencoder_Linear128_multiple()
-# autoencoder = Autoencoder_Convolutional_Simple64()
-# autoencoder = Autoencoder_Convolutional_Simple64_with_linear()
-# autoencoder = Autoencoder_Convolutional_Simple64_2()
 # autoencoder = Autoencoder_Convolutional_normal()
 # autoencoder = Autoencoder_Convolutional_normal_nocomp()
 # autoencoder = Autoencoder_Convolutional_normal_safe()
 autoencoder = Autoencoder_Convolutional_normal_double_filters()
+# autoencoder = Autoencoder_Convolutional_Simple()
 
-###### compile ##################
-# custom_optimizer = Adam(learning_rate=1e-4, clipnorm=1.0)
-autoencoder.compile(optimizer="adam", loss="mean_squared_error")
 
-###### load weights #############
-# autoencoder.load_weights("./models/Autoencoder_Linear16nPositions1000000.h5")
-# autoencoder.load_weights("./models/Autoencoder_Linear128nPositions1000000.h5")
+###### compile #####################################################################################################
+optimizer = Adam(learning_rate=1e-4, clipnorm=1.0)
+# optimizer = SGD(learning_rate=0.02)
+autoencoder.compile(optimizer=optimizer, loss="mean_squared_error")
+
+
+###### load weights ################################################################################################
+
 # autoencoder.load_weights(
 #     "./models/Autoencoder_Convolutional_Simple128nPositions500000.h5"
 # )
@@ -74,18 +78,39 @@ autoencoder.compile(optimizer="adam", loss="mean_squared_error")
 # autoencoder.load_weights(
 #     "./models/Autoencoder_Convolutional_normalnPositions3000000.h5"
 # )
+# autoencoder.load_weights(
+#     "./models/Autoencoder_Convolutional_normal_safenPositions3000000.h5"
+# )
+autoencoder.load_weights(
+    "./models/Autoencoder_Convolutional_normal_double_filtersnPositions3000000.h5"
+)
+
+
 # autoencoder.load_weights("./models/Autoencoder_Linear128_4layersnPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear128_multiplenPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear128nPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear64nPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear32nPositions3000000.h5")
 # autoencoder.load_weights("./models/Autoencoder_Linear16nPositions3000000.h5")
-# autoencoder.load_weights(
-#     "./models/Autoencoder_Convolutional_normal_safenPositions3000000.h5"
+
+
+###### train ########################################################################################################
+# autoencoder.train(TXT_file=TXT_FILE, num_positions=3000000, epochs=4)
+
+# encoded = autoencoder.encode_FEN_position(
+#     FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - ")
 # )
 
-###### train ####################
-autoencoder.train(PGN_FILE, 3000000, chunk_size=25000, epochs=4)
+autoencoder.test_encode_decode(
+    FEN("rnbqkb1r/pp1pp1pp/2p2n2/5p2/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 1 4")
+)
+
+
+###### test #########################################################################################################
 
 tester = EmbeddingTester(autoencoder, PGN_FILE)
 tester.test_all()
+
+
+###### extract games to txt #########################################################################################
+# PGNReader.extract_unique_games_to_txt(PGN_FILE, TXT_FILE, 3000000)

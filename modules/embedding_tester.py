@@ -42,17 +42,17 @@ class EmbeddingTester:
                 output_file,
             )
 
-            self.wrap_test_with_print(
-                self.test_meaningful_positions,
-                "######## test meaningful positions #########\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_meaningful_positions,
+            #     "######## test meaningful positions #########\n",
+            #     output_file,
+            # )
 
-            self.wrap_test_with_print(
-                self.test_opening_positions,
-                "######## test opening positions ############\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_opening_positions,
+            #     "######## test opening positions ############\n",
+            #     output_file,
+            # )
 
             self.wrap_test_with_print(
                 self.test_eco,
@@ -60,29 +60,29 @@ class EmbeddingTester:
                 output_file,
             )
 
-            self.wrap_test_with_print(
-                self.test_tactics,
-                "######## test tactics ######################\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_tactics,
+            #     "######## test tactics ######################\n",
+            #     output_file,
+            # )
 
-            self.wrap_test_with_print(
-                self.test_before_mate_and_mate,
-                "######## test mate #########################\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_before_mate_and_mate,
+            #     "######## test mate #########################\n",
+            #     output_file,
+            # )
 
-            self.wrap_test_with_print(
-                self.test_random_and_mates,
-                "######## test mate #########################\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_random_and_mates,
+            #     "######## test mate #########################\n",
+            #     output_file,
+            # )
 
-            self.wrap_test_with_print(
-                self.test_expert_players,
-                "######## expert players ####################\n",
-                output_file,
-            )
+            # self.wrap_test_with_print(
+            #     self.test_expert_players,
+            #     "######## expert players ####################\n",
+            #     output_file,
+            # )
 
     def test_legal_vs_illegal_positions(self, output_file):
 
@@ -136,30 +136,6 @@ class EmbeddingTester:
             self.test_amount,
         )
         self.compare_sets(opening_sets, "long_opening_test", output_file)
-
-        # opening_sets = opening_extractor.extract_opening_position(
-        #     self.PGN_file,
-        #     [
-        #         [
-        #             "d4",
-        #             "Nf6",
-        #             "c4",
-        #             "g6",
-        #             "Nc3",
-        #             "d5",
-        #             "cxd5",
-        #             "Nxd5",
-        #             "e4",
-        #             "Nxc3",
-        #             "bxc3",
-        #             "Bg7",
-        #         ],
-        #         ["e4", "c5", "Nf3", "d6", "d4", "cxd4", "Nxd4", "Nf6", "Nc3", "g6"],
-        #     ],
-        #     MOVES_AFTER_OPENING,
-        #     self.test_amount,
-        # )
-        # self.compare_sets(opening_sets, "opening_test", output_file)
 
     def test_eco(self, output_file):
         ECO_FILE = "./data/openings_sheet.csv"

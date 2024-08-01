@@ -42,6 +42,27 @@ class PGNReader:
             return np.array(list(read_positions)[:num_positions])
 
     @staticmethod
+    def extract_unique_games_to_txt(PGN_file: str, TXT_file: str, num_positions):
+        read_positions = PGNReader.read_unique_positions_from_file(
+            PGN_file, num_positions
+        )
+        with open(TXT_file, "w") as file:
+            for position in read_positions:
+                file.write(position.FEN + "\n")
+
+    @staticmethod
+    def read_positions_from_txt(TXT_file: str, num_positions):
+        read_positions = set()
+        with open(TXT_file, "r") as file:
+            for line in file:
+                if len(read_positions) >= num_positions:
+                    break
+                line = line.strip()
+                read_positions.add(FEN(line))
+
+        return np.array(list(read_positions))
+
+    @staticmethod
     def read_unique_positions_from_file(
         PGN_file: str, num_positions: int, from_move: int = None
     ):

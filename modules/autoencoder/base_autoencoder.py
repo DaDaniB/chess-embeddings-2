@@ -44,49 +44,43 @@ class BaseAutoEncoder(tf.keras.models.Model, ABC):
         return FENs
 
     def train(
-        self, PGN_file: str, num_positions: int, chunk_size: int = None, epochs: int = 1
+        self,
+        PGN_file: str = None,
+        num_positions: int = 100000,
+        epochs: int = 1,
+        TXT_file: str = None,
     ):
-        if chunk_size is None:
-            chunk_size = num_positions
+        positions_vectorized = None
+        if TXT_file is not None:
+            positions_vectorized = self.get_position_vectors_from_TXT(
+                TXT_file, num_positions
+            )
+        else:
+            positions_vectorized = self.get_position_vectors_from_PGN(
+                PGN_file, num_positions
+            )
 
-        positions_vectorized = self.get_position_vectors_from_PGN(
-            PGN_file, num_positions
-        )
-        self.train_on_vectors(positions_vectorized, chunk_size, epochs)
-
-        savename = self.__class__.__name__ + "nPositions" + str(num_positions)
-        self.training_metrics.save(savename)
-        self.save(savename)
+        self.train_on_vectors(positions_vectorized, epochs)
+        self.save(savename=self.__class__.__name__ + "nPositions" + str(num_positions))
 
     def get_position_vectors_from_PGN(self, PGN_file: str, num_positions: int):
         FEN_positions = PGNReader.read_unique_positions_from_file_fast(
             PGN_file, num_positions
         )
-
         return self.vectorize_FENs(FEN_positions)
 
-    def train_on_vectors(self, positions_vectorized, chunk_size, epochs):
+    def get_position_vectors_from_TXT(self, TXT_file: str, num_positions: int):
+        FEN_positions = PGNReader.read_positions_from_txt(TXT_file, num_positions)
+        return self.vectorize_FENs(FEN_positions)
+
+    def train_on_vectors(self, positions_vectorized, epochs):
         if positions_vectorized is None or len(positions_vectorized) <= 0:
             return
 
-        for i in range(epochs):
-            print(f"epoch {i} of {epochs}")
-
-            for j in range(0, len(positions_vectorized), chunk_size):
-                position_vector_chunk = positions_vectorized[j : j + chunk_size]
-                if position_vector_chunk is None or len(position_vector_chunk) <= 0:
-                    return
-
-                position_chunk_tensor = tf.constant(
-                    position_vector_chunk, dtype=constants.TF_DATA_TYPE
-                )
-
-                history = self.fit(
-                    position_chunk_tensor, position_chunk_tensor, epochs=1, shuffle=True
-                )
-                self.training_metrics.add_history(history, chunk_size)
-
-            self.training_metrics.add_epoch_data()
+        positions_tensor = tf.constant(
+            positions_vectorized, dtype=constants.TF_DATA_TYPE
+        )
+        self.fit(positions_tensor, positions_tensor, epochs=epochs, shuffle=True)
 
     def save(self, savename: str):
         self.save_weights(constants.MODELS_SAVE_DIR + "/" + savename + ".h5")
@@ -95,9 +89,23 @@ class BaseAutoEncoder(tf.keras.models.Model, ABC):
         position_tensor = self.FEN_to_tensor(FEN)
         return self.encoder(position_tensor)
 
+    def decode_tensor_toFen(self, tensor):
+        decoded = self.decoder(tensor)
+        return self.vector_to_FEN(decoded)
+
+    def test_encode_decode(self, test_fen: str):
+        position_tensor = self.FEN_to_tensor(test_fen)
+
+        encoded = self.encoder(position_tensor).numpy()
+        decoded = self.decoder(encoded)[0].numpy()
+
+        decoded_rounded = np.floor(decoded + 0.5).astype(bool)
+        predicted_fen = self.vector_to_FEN(decoded_rounded)
+
+        print(test_fen)
+        print(predicted_fen)
+
     def encode_FEN_position(self, FEN: FEN):
-        # position_tensor = self.FEN_to_tensor(FEN)
-        # return self.encoder(position_tensor).numpy()
         return self.encode_FEN_position_tensor(FEN).numpy()
 
     def FEN_to_tensor(self, FEN: FEN):

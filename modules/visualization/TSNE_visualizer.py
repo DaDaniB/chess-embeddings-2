@@ -77,7 +77,7 @@ class TSNEVisualizer:
     @staticmethod
     def reduce_with_tsne(points: list[Point]) -> list[TSNEPoint]:
 
-        tsne = TSNE(n_components=2, random_state=42)
+        tsne = TSNE(n_components=2)
         predictions = TSNEVisualizer.get_predictions_as_list(points)
         predictions = predictions.reshape((predictions.shape[0], -1))
         tsne_result = tsne.fit_transform(predictions)
