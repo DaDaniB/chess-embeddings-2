@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers
+from tensorflow.keras.optimizers import Adam
 
 from modules.autoencoder.base_autoencoder import BaseAutoEncoder
 from modules.FEN_converter import FENConverter
@@ -59,6 +60,12 @@ class Autoencoder_Convolutional_Simple(BaseAutoEncoder):
         decoded = self.decoder(encoded)
         return decoded
 
+    def initialize(self):
+        optimizer = Adam(learning_rate=1e-4, clipnorm=1.0)
+        self.compile(
+            optimizer=optimizer, loss="mean_squared_error", metrics=["accuracy"]
+        )
+
     def load_weights(self, filepath):
         self.build(
             (
@@ -69,6 +76,11 @@ class Autoencoder_Convolutional_Simple(BaseAutoEncoder):
             )
         )
         super(Autoencoder_Convolutional_Simple, self).load_weights(filepath)
+
+    def load_default_weights(self):
+        self.load_weights(
+            "./models/Autoencoder_Convolutional_SimplenPositions3000000.h5"
+        )
 
     def vectorize_FEN(self, fen: str):
         return FENConverter.to_bitboards(fen)

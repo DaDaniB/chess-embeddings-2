@@ -42,17 +42,17 @@ class EmbeddingTester:
                 output_file,
             )
 
-            # self.wrap_test_with_print(
-            #     self.test_meaningful_positions,
-            #     "######## test meaningful positions #########\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_meaningful_positions,
+                "######## test meaningful positions #########\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_opening_positions,
-            #     "######## test opening positions ############\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_opening_positions,
+                "######## test opening positions ############\n",
+                output_file,
+            )
 
             self.wrap_test_with_print(
                 self.test_eco,
@@ -60,29 +60,29 @@ class EmbeddingTester:
                 output_file,
             )
 
-            # self.wrap_test_with_print(
-            #     self.test_tactics,
-            #     "######## test tactics ######################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_tactics,
+                "######## test tactics ######################\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_before_mate_and_mate,
-            #     "######## test mate #########################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_before_mate_and_mate,
+                "######## test mate #########################\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_random_and_mates,
-            #     "######## test mate #########################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_random_and_mates,
+                "######## test mate #########################\n",
+                output_file,
+            )
 
-            # self.wrap_test_with_print(
-            #     self.test_expert_players,
-            #     "######## expert players ####################\n",
-            #     output_file,
-            # )
+            self.wrap_test_with_print(
+                self.test_expert_players,
+                "######## expert players ####################\n",
+                output_file,
+            )
 
     def test_legal_vs_illegal_positions(self, output_file):
 
@@ -198,7 +198,9 @@ class EmbeddingTester:
         TSNEVisualizer.visualize_tsne(
             self.autoencoder,
             position_sets,
-            visualization_file_name=tsne_file_name,
+            visualization_file_name=self.autoencoder.__class__.__name__
+            + "_"
+            + tsne_file_name,
             num_points_to_visualize=num_visualize,
         )
 

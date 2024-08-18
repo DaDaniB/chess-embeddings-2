@@ -1,11 +1,12 @@
 import tensorflow as tf
 from tensorflow.keras import layers
+from tensorflow.keras.optimizers import Adam, SGD
 
 
 from modules import constants
 from modules.FEN_converter import FENConverter
 from modules.autoencoder.base_autoencoder import BaseAutoEncoder
-
+from modules.autoencoder.weighted_mse import WeightedMSE
 from modules.vectorization.FEN import FEN
 
 LATENT_DIM = 32
@@ -32,9 +33,17 @@ class Autoencoder_Linear32(BaseAutoEncoder):
         decoded = self.decoder(encoded)
         return decoded
 
+    def initialize(self):
+        optimizer = Adam(learning_rate=1e-3)
+        loss = WeightedMSE(weight_for_1=4.0)
+        self.compile(optimizer=optimizer, loss=loss, metrics=["accuracy"])
+
     def load_weights(self, filepath):
         self.build((None, INPUT_SIZE))
         super(Autoencoder_Linear32, self).load_weights(filepath)
+
+    def load_default_weights(self):
+        self.load_weights("./models/Autoencoder_Linear32nPositions3000000.h5")
 
     def vectorize_FEN(self, fen: FEN):
         return FENConverter.to_vector(fen)

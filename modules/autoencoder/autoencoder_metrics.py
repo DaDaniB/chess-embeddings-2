@@ -7,6 +7,33 @@ class Autoencoder_Metrics:
         self.cumulative_inputs = []
         self.epoch_data = []
 
+    @staticmethod
+    def print_hist(history):
+        loss = history.history["loss"]
+        val_loss = history.history["val_loss"]
+        accuracy = history.history["accuracy"]
+        val_accuracy = history.history["val_accuracy"]
+
+        # Plot training & validation loss values
+        plt.figure(figsize=(12, 4))
+        plt.subplot(1, 2, 1)
+        plt.plot(loss, label="Training Loss")
+        plt.plot(val_loss, label="Validation Loss")
+        plt.title("Model Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend(loc="upper right")
+
+        # Plot training & validation accuracy values
+        plt.subplot(1, 2, 2)
+        plt.plot(accuracy, label="Training Accuracy")
+        plt.plot(val_accuracy, label="Validation Accuracy")
+        plt.title("Model Accuracy")
+        plt.xlabel("Epoch")
+        plt.ylabel("Accuracy")
+        plt.legend(loc="lower right")
+        plt.savefig("./metrics.png")
+
     def add_history(self, history, num_inputs):
         self.accumulated_loss.extend(history.history["loss"])
         prev_cumulative_inputs = 0

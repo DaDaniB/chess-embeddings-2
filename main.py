@@ -45,6 +45,10 @@ load_dotenv()
 PGN_FILE = os.getenv("PGN_FILE")
 TXT_FILE = "./data/extracted.txt"
 
+TEST_UNSEEN = "./data/test_unseen.txt"
+TEST_SEEN = "./data/test_seen.txt"
+OUTPUT_TEST = "./test_output.txt"
+
 
 ###### AUTOENCODER ################################################################################################
 # autoencoder = Autoencoder_NoEncode()
@@ -54,17 +58,15 @@ TXT_FILE = "./data/extracted.txt"
 # autoencoder = Autoencoder_Linear128()
 # autoencoder = Autoencoder_Linear128_4layers()
 # autoencoder = Autoencoder_Linear128_multiple()
-# autoencoder = Autoencoder_Convolutional_normal()
-# autoencoder = Autoencoder_Convolutional_normal_nocomp()
-# autoencoder = Autoencoder_Convolutional_normal_safe()
-autoencoder = Autoencoder_Convolutional_normal_double_filters()
+autoencoder = Autoencoder_Convolutional_normal()
+# autoencoder = Autoencoder_Convolutional_normal_nocomp()  # bad
+# autoencoder = Autoencoder_Convolutional_normal_safe()  # very bad
+# autoencoder = Autoencoder_Convolutional_normal_double_filters()
 # autoencoder = Autoencoder_Convolutional_Simple()
 
 
-###### compile #####################################################################################################
-optimizer = Adam(learning_rate=1e-4, clipnorm=1.0)
-# optimizer = SGD(learning_rate=0.02)
-autoencoder.compile(optimizer=optimizer, loss="mean_squared_error")
+###### init ########################################################################################################
+autoencoder.initialize()
 
 
 ###### load weights ################################################################################################
@@ -81,9 +83,9 @@ autoencoder.compile(optimizer=optimizer, loss="mean_squared_error")
 # autoencoder.load_weights(
 #     "./models/Autoencoder_Convolutional_normal_safenPositions3000000.h5"
 # )
-autoencoder.load_weights(
-    "./models/Autoencoder_Convolutional_normal_double_filtersnPositions3000000.h5"
-)
+# autoencoder.load_weights(
+#     "./models/Autoencoder_Convolutional_normal_double_filtersnPositions3000000.h5"
+# )
 
 
 # autoencoder.load_weights("./models/Autoencoder_Linear128_4layersnPositions3000000.h5")
@@ -95,7 +97,7 @@ autoencoder.load_weights(
 
 
 ###### train ########################################################################################################
-# autoencoder.train(TXT_file=TXT_FILE, num_positions=3000000, epochs=4)
+autoencoder.train(TXT_file=TXT_FILE, num_positions=3000020, epochs=12)
 
 # encoded = autoencoder.encode_FEN_position(
 #     FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - ")
@@ -104,13 +106,25 @@ autoencoder.load_weights(
 autoencoder.test_encode_decode(
     FEN("rnbqkb1r/pp1pp1pp/2p2n2/5p2/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 1 4")
 )
+autoencoder.test_encode_decode(
+    FEN("rn1qk2r/ppp2ppp/5n2/2b1Nb2/2B5/2NP4/PPP2PPP/R1BQ1RK1 b kq - 0 8")
+)
+autoencoder.test_encode_decode(FEN("R5k1/6p1/8/8/3K2p1/8/8/8 b - - 1 42"))
+autoencoder.test_encode_decode(
+    FEN("2kr3r/ppb5/2p1p1p1/5p2/2B3P1/2P4P/PP3R2/R5K1 b - - 4 25")
+)
+autoencoder.test_encode_decode(FEN("8/p1k5/1p6/2P3p1/4K1B1/2P4P/r7/8 b - - 0 38"))
 
 
 ###### test #########################################################################################################
-
-tester = EmbeddingTester(autoencoder, PGN_FILE)
-tester.test_all()
+# with open(OUTPUT_TEST, "w") as test_output:
+#     autoencoder.test_on_txt_file(TEST_SEEN, test_output)
+#     autoencoder.test_on_txt_file(TEST_UNSEEN, test_output)
+# tester = EmbeddingTester(autoencoder, PGN_FILE)
+# tester.test_all()
 
 
 ###### extract games to txt #########################################################################################
 # PGNReader.extract_unique_games_to_txt(PGN_FILE, TXT_FILE, 3000000)
+# PGNReader.extrace_unique_positions_from_file(PGN_FILE, TEST_UNSEEN, 3000000, 600000)
+# PGNReader.extract_random_lines(TXT_FILE, TEST_SEEN, 600000)

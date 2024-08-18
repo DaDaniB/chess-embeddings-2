@@ -11,35 +11,46 @@ from modules.vectorization.FEN import FEN
 class PGNReader:
 
     @staticmethod
-    def read_unique_positions_from_file_fast(
-        PGN_file: str, num_positions: int, from_move: int = None, chunk_size=1024 * 1024
+    def extrace_unique_positions_from_file(
+        PGN_file: str, TXT_file: str, after_position: int, num_positions: int
     ):
-        read_positions = set()
-        with open(PGN_file, "r") as file:
-            buffer = ""
-            while True:
-                chunk = file.read(chunk_size)
-                if not chunk:
-                    break
-                buffer += chunk
+        positions_to_skip = set()
 
-                # games = buffer.split("\n\n\n")
-                splitter = "[Event"
-                games = [splitter + text for text in buffer.split(splitter) if text]
-                buffer = games.pop()
+        extracted_games = 0
+        with open(TXT_file, "w") as output:
+            with open(PGN_file, "r") as input:
+                while True:
 
-                for game_text in games:
-                    game_io = io.StringIO(game_text)
-                    game = chess.pgn.read_game(game_io)
-                    if game is not None:
-                        positions_of_game = PGNReader.get_FEN_positions_of_game(
-                            game, from_move
-                        )
-                        read_positions.update(positions_of_game)
+                    game = chess.pgn.read_game(input)
+                    if game is None:
+                        break
 
-                if len(read_positions) > num_positions:
-                    break
-            return np.array(list(read_positions)[:num_positions])
+                    positions_of_game = PGNReader.get_FEN_positions_of_game(game)
+
+                    if len(positions_to_skip) < after_position:
+                        positions_to_skip.update(positions_of_game)
+                    else:
+                        for position in positions_of_game:
+                            output.write(position.FEN + "\n")
+                        extracted_games += len(positions_of_game)
+
+                    if extracted_games > num_positions:
+                        break
+
+    @staticmethod
+    def extract_random_lines(input_txt, output_txt, num_lines):
+        with open(input_txt, "r") as input:
+            input_lines = input.readlines()
+
+        if num_lines > len(input_lines):
+            raise ValueError(
+                "Number of lines to read is greater than lines in inputfile"
+            )
+
+        random_input_lines = random.sample(input_lines, num_lines)
+        with open(output_txt, "w") as output:
+            for line in random_input_lines:
+                output.write(line.strip() + "\n")
 
     @staticmethod
     def extract_unique_games_to_txt(PGN_file: str, TXT_file: str, num_positions):
@@ -51,11 +62,11 @@ class PGNReader:
                 file.write(position.FEN + "\n")
 
     @staticmethod
-    def read_positions_from_txt(TXT_file: str, num_positions):
+    def read_positions_from_txt(TXT_file: str, num_positions: int = None):
         read_positions = set()
         with open(TXT_file, "r") as file:
             for line in file:
-                if len(read_positions) >= num_positions:
+                if num_positions is not None and len(read_positions) >= num_positions:
                     break
                 line = line.strip()
                 read_positions.add(FEN(line))
